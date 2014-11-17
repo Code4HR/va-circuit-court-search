@@ -18,13 +18,22 @@ def getCases(html, name, names):
                 'date': cols[3].string.strip(),
                 'status': cols[4].string.strip()
             })
+        elif len(cols) > 3:
+            if name not in cols[1].get_text() and name not in cols[2].get_text():
+                return True
+            names.append({
+                'caseNumber': cols[0].span.a.string.strip(),
+                'name': cols[1].get_text(), 
+                'otherName': cols[2].get_text(),
+                'status': cols[3].string.strip()
+            })
     return False
 
 
-def search(opener, name, court):    
+def search(opener, name, court, division):    
     cases = []
     
-    data = urllib.urlencode({'category':'R',
+    data = urllib.urlencode({'category': division,
         'lastName':name,
         'courtId':court,
         'submitValue':'N'})
@@ -37,7 +46,7 @@ def search(opener, name, court):
         'firstCaseProcessed':'',
         'lastNameProcessed':'',
         'firstNameProcessed':'',
-        'category':'R',
+        'category': division,
         'firstCaseSerialNumber':0,
         'lastCaseSerialNumber':0,
         'searchType':'',
@@ -71,8 +80,8 @@ def start(name):
             'sessionCreate':'NEW',
             'whichsystem':system})
         place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
-        cases = search(opener, name, courtId)
-        response['cases'] = cases
+        response['criminalCases'] = search(opener, name, courtId, 'R')
+        response['civilCases'] = search(opener, name, courtId, 'CIVIL')
         yield response
 
 @app.route("/")

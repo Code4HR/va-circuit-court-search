@@ -29,7 +29,9 @@
 <div class="container">
     {% for court in data.courts %}
         <h2>{{ court.court }}</h2>
-        {% for case in court.cases %}
+        
+        <h4>Criminal</h4>
+        {% for case in court.criminalCases %}
             <div class="row">
                 <div class="col-xs-6">
                     <div>{{ case.name }}</div>
@@ -38,6 +40,20 @@
                 <div class="col-xs-6 text-right">
                     <div>{{ case.charge }}</div>
                     <div class="text-muted"><small>{{ case.status }} ({{ case.date }})</small></div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <h4>Civil</h4>
+        {% for case in court.civilCases %}
+            <div class="row">
+                <div class="col-xs-6">
+                    <div>{{ case.name }}</div>
+                    <div class="text-muted"><small>{{ case.caseNumber }}</small></div>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <div>{{ case.otherName }}</div>
+                    <div class="text-muted"><small>{{ case.status }}</small></div>
                 </div>
             </div>
         {% endfor %}
