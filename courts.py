@@ -2,28 +2,34 @@ import scraperwiki
 import cookielib, urllib, urllib2
 import json
 from bs4 import BeautifulSoup
-from flask import Flask, Response
+from flask import Flask, Response, render_template
 app = Flask(__name__)
 
-def getNames(html, name, names):
+def getCases(html, name, names):
     for row in html.find(class_="nameList").find_all('tr'):
         cols = row.find_all('td')
         if len(cols) > 4:
             if name not in cols[1].string:
                 return True
-            names.append({'name': cols[1].string.strip(), 'charge': cols[2].string.strip()})
+            names.append({
+                'caseNumber': cols[0].span.a.string.strip(),
+                'name': cols[1].string.strip(), 
+                'charge': cols[2].string.strip(),
+                'date': cols[3].string.strip(),
+                'status': cols[4].string.strip()
+            })
     return False
 
 
 def search(opener, name, court):    
-    names = []
+    cases = []
     
     data = urllib.urlencode({'category':'R',
         'lastName':name,
         'courtId':court,
         'submitValue':'N'})
     search = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
-    done = getNames(BeautifulSoup(search.read()), name, names)
+    done = getCases(BeautifulSoup(search.read()), name, cases)
 
     data = urllib.urlencode({'courtId':court,
         'pagelink':'Next',
@@ -39,8 +45,8 @@ def search(opener, name, court):
     while(not done):
         search = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
         content = search.read()
-        done = getNames(BeautifulSoup(content), name, names)
-    return names
+        done = getCases(BeautifulSoup(content), name, cases)
+    return cases
 
 def start(name):
     cj = cookielib.CookieJar()
@@ -65,13 +71,13 @@ def start(name):
             'sessionCreate':'NEW',
             'whichsystem':system})
         place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
-        names = search(opener, name, courtId)
-        response['names'] = names
+        cases = search(opener, name, courtId)
+        response['cases'] = cases
         yield response
 
 @app.route("/")
-def hello():
-    return "Hello World!"
+def index():
+    return render_template('index.html')
 
 def stream_template(template_name, **context):
     # http://flask.pocoo.org/docs/patterns/streaming/#streaming-from-templates

@@ -1,0 +1,49 @@
+<!doctype html>
+<title>VA Circuit Court Statewide Search</title>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .navbar { 
+        border-radius: 0px;
+    }
+</style>
+<nav class="navbar navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">VA Circuit Court Statewide Search</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <form id="searchForm" role="form" onSubmit="return onSubmit();">
+        <div class="form-group">
+            <label for="search">Search</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="search" placeholder="Name">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Go!</button>
+                </span>
+            </div>
+        </div>
+    </form>
+    <div class="row text-muted">
+        <div class="col-xs-6 text-right">
+            <div>Syntax: lastname, firstname </div>
+            <div>Syntax: partial_lastname  </div>
+        </div>
+        <div class="col-xs-6 text-left">
+            <div>Example: Smith, John </div>
+            <div>Example: Smi</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function onSubmit() {
+        var search = document.getElementById("search").value;
+        if(search != '') {
+            location = "/search/" + search;
+        }
+        return false;
+    }
+</script>
