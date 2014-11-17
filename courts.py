@@ -67,15 +67,24 @@ def start(name):
         place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
         names = search(opener, name, courtId)
         response['names'] = names
-        yield json.dumps(response)
+        yield response
 
 @app.route("/")
 def hello():
     return "Hello World!"
 
+def stream_template(template_name, **context):
+    # http://flask.pocoo.org/docs/patterns/streaming/#streaming-from-templates
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    # uncomment if you don't need immediate reaction
+    ##rv.enable_buffering(5)
+    return rv
+
 @app.route('/search/<name>')
 def search_name(name):
-    return Response(start(name.upper()), mimetype='application/json')
+    return Response(stream_template('search.html', data={'name': name.upper(), 'courts': start(name.upper())}))
 
 if __name__ == "__main__":
     app.debug = True

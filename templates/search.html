@@ -1,0 +1,8 @@
+<!doctype html>
+<title>Search {{ data.name }}</title>
+{% for court in data.courts %}
+    <h2>{{ court.court }}</h2>
+    {% for name in court.names %}
+        <div>{{ name.name }} - {{ name.charge}}</div>
+    {% endfor %}
+{% endfor %}
