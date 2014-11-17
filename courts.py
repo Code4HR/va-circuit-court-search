@@ -52,10 +52,13 @@ def search(opener, name, court, division):
         'lastCaseSerialNumber':0,
         'searchType':'',
         'emptyList':''})
-    while(not done):
+    
+    count = 1
+    while(not done and count < 6):
         search = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
         content = search.read()
         done = getCases(BeautifulSoup(content), name, cases)
+        count += 1
     return cases
 
 def start(name):
