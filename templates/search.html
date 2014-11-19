@@ -15,6 +15,7 @@
 </script>
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <style>
     .row { 
         padding: 5px;
@@ -41,36 +42,22 @@
 </nav>
 
 <div class="container">
+    <div id="search-active">
+        <div>
+            Searching <span id="countSearched"></span> of <span id="countTotal"></span> courts
+        </div>
+        <div>
+            <button id="stop-search-button" class="btn btn-danger">Stop Search</button>
+        </div>
+    </div>
+    
     {% for court in data.courts %}
-        <h2>{{ court.court }}</h2>
-        
-        <h4>Criminal</h4>
-        {% for case in court.criminalCases %}
-            <div class="row">
-                <div class="col-xs-6">
-                    <div>{{ case.name }}</div>
-                    <div class="text-muted"><small>{{ case.caseNumber }}</small></div>
-                </div>
-                <div class="col-xs-6 text-right">
-                    <div>{{ case.charge }}</div>
-                    <div class="text-muted"><small>{{ case.status }} ({{ case.date }})</small></div>
-                </div>
+        <div id="{{ court.id }}">
+            <h2>{{ court.name }}</h2>
+            <div class="search-result">
+                <div class="text-muted"><i class="fa fa-spinner fa-spin"></i> Loading</div>
             </div>
-        {% endfor %}
-        
-        <h4>Civil</h4>
-        {% for case in court.civilCases %}
-            <div class="row">
-                <div class="col-xs-6">
-                    <div>{{ case.name }}</div>
-                    <div class="text-muted"><small>{{ case.caseNumber }}</small></div>
-                </div>
-                <div class="col-xs-6 text-right">
-                    <div>{{ case.otherName }}</div>
-                    <div class="text-muted"><small>{{ case.status }}</small></div>
-                </div>
-            </div>
-        {% endfor %}
+        </div>
     {% endfor %}
 </div>
 
@@ -79,3 +66,47 @@
         Built by <a href="http://code4hr.org">Code for Hampton Roads</a> | <a href="https://github.com/Code4HR/va-circuit-court-search"><i class="icon-github"></i> Pull requests welcome!</a>
     </p>
 </div>
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script>
+    var name = {{ data.name|tojson|safe }};
+    var courts = {{ data.courts|tojson|safe }};
+    var courtCount = courts.length;
+    var stopSearch = false;
+    
+    $('#countTotal').text(courtCount);
+    
+    $('#stop-search-button').on('click', function() {
+       stopSearch = true;
+       $(this).prop("disabled", true); 
+    });
+    
+    function courtSearch() {
+        if(courts.length < 1 || stopSearch) {
+            $("#search-active").hide();
+            return;
+        }
+        
+        court = courts[0];
+        courts.shift();
+        
+        $('#countSearched').text(courtCount - courts.length);
+        
+        console.log('Run search for ' + name + ' on ' + court.name);
+        setTimeout(function() {
+            $.get('/search/' + name + '/court/' + court.fullName, function(data) {
+                var selector = '#' + court.id + ' .search-result';
+                console.log(selector);
+                $(selector).html(data);
+            })
+            .fail(function() {
+                $('#' + court.id + ' .search-result').html("Error");
+            })
+            .always(function() {
+                courtSearch();
+            })
+        }, 1000);
+    }
+    
+    courtSearch();
+</script>
