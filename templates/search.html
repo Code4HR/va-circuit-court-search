@@ -43,6 +43,7 @@
 
 <div class="container">
     <div id="search-active">
+        <h1>Search {{ data.name }}</h1>
         <div>
             Searching <span id="countSearched"></span> of <span id="countTotal"></span> courts
         </div>
@@ -92,20 +93,24 @@
         
         $('#countSearched').text(courtCount - courts.length);
         
-        console.log('Run search for ' + name + ' on ' + court.name);
         setTimeout(function() {
             $.get('/search/' + name + '/court/' + court.fullName, function(data) {
                 var selector = '#' + court.id + ' .search-result';
-                console.log(selector);
                 $(selector).html(data);
             })
             .fail(function() {
-                $('#' + court.id + ' .search-result').html("Error");
+                var retryFunction = "retry('" + court.fullName + "','" + court.id + "')";
+                $('#' + court.id + ' .search-result').html('<div>Error</div><div><button class="btn" onclick="' + retryFunction + '">Retry</button></div>');
             })
             .always(function() {
                 courtSearch();
             })
         }, 1000);
+    }
+    
+    function retry(fullName, id) {
+        $('#' + id + ' .search-result').html('<div class="text-muted"><i class="fa fa-spinner fa-spin"></i> Loading</div>');
+        courts.unshift({'fullName': fullName, 'id': id});
     }
     
     courtSearch();

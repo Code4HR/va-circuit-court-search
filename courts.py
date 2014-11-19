@@ -65,7 +65,7 @@ def lookupCases(opener, name, court, division):
         count += 1
     return cases
 
-@app.route("/search/<name>/court/<court>")
+@app.route("/search/<name>/court/<path:court>")
 def searchCourt(name, court):
     if 'cookies' not in session:
         return "Error. Please reload the page."
