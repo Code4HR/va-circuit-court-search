@@ -65,6 +65,43 @@ def lookupCases(opener, name, court, division):
         count += 1
     return cases
 
+def getCasesInVirginiaBeach(html, name, names):
+    resultsTable = html.find(class_="tablesorter")
+    if resultsTable is None:
+        return True
+    
+    for row in resultsTable.find('tbody').find_all('tr'):
+        cols = row.find_all('td')
+        if len(cols) > 5:
+            names.append({
+                'caseNumber': cols[0].a.string or '',
+                'link': 'https://vbcircuitcourt.com' + cols[0].a['href'],
+                'otherName': cols[1].string or '', 
+                'caseStyle': ''.join(cols[2].findAll(text=True)).replace('\r\n', ' ') or '',
+                'name': ''.join(cols[3].findAll(text=True)).replace('\r\n', ' ') or '',
+                'partyType': cols[4].string.capitalize() + ':',
+                'status': cols[5].string or ''
+            })
+    return False
+    
+def lookupCasesInVirginiaBeach(name, division):    
+    cases = []
+    
+    url = 'https://vbcircuitcourt.com/public/search.do?searchType=1&indexName=publiccasesearch&q=' + name.replace(' ', '+')
+    url = url + '%20FilterByCourtType:"' + division + '"'
+    
+    searchResults = urllib2.urlopen(url)
+    html = searchResults.read()
+    done = getCasesInVirginiaBeach(BeautifulSoup(html), name, cases)
+    
+    count = 1
+    while(not done and count < 6):
+        searchResults = urllib2.urlopen(url + '&start=' + str(count * 30))
+        html = searchResults.read()
+        done = getCasesInVirginiaBeach(BeautifulSoup(html), name, cases)
+        count += 1
+    return cases
+
 @app.route("/search/<name>/court/<path:court>")
 def searchCourt(name, court):
     if 'cookies' not in session:
@@ -88,6 +125,11 @@ def searchCourt(name, court):
     courtSearch = {'name': court[5:], 'id': courtId}
     courtSearch['criminalCases'] = lookupCases(opener, name.upper(), courtId, 'R')
     courtSearch['civilCases'] = lookupCases(opener, name.upper(), courtId, 'CIVIL')
+    
+    if 'Virginia Beach' in court:
+        courtSearch['criminalCases'].extend(lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
+        courtSearch['civilCases'].extend(lookupCasesInVirginiaBeach(name, 'CIVIL'))
+    
     return render_template('court.html', court=courtSearch)
     
 @app.route("/search/<name>")

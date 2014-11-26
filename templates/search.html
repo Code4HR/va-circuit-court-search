@@ -45,7 +45,7 @@
     <h1>Search {{ data.name }}</h1>
     <div id="search-active">
         <div>
-            Searching <span id="countSearched"></span> of <span id="countTotal"></span> courts
+            Searching <span id="countSearched"></span> of <span id="countTotal"></span> courts - Grab a cup of coffee, this may take a while...
         </div>
         <div>
             <button id="stop-search-button" class="btn btn-danger">Stop Search</button>
@@ -112,6 +112,11 @@
     function retry(fullName, id) {
         $('#' + id + ' .search-result').html('<div class="text-muted"><i class="fa fa-spinner fa-spin"></i> Loading</div>');
         courts.unshift({'fullName': fullName, 'id': id});
+        
+        if(courts.length == 1 || stopSearch) {
+            stopSearch = false;
+            courtSearch();
+        }
     }
     
     courtSearch();
