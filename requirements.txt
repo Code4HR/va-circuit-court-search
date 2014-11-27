@@ -1,4 +1,2 @@
 Flask==0.10.1
 beautifulsoup4==4.3.2
-scraperwiki==0.4.1
-
