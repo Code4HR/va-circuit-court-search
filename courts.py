@@ -23,7 +23,8 @@ def getCases(html, name, names):
                 'status': cols[4].string.strip()
             })
         elif len(cols) > 3:
-            if name not in cols[1].get_text() and name not in cols[2].get_text():
+            if name not in cols[1].get_text() and name not in \
+                    cols[2].get_text():
                 return True
             names.append({
                 'caseNumber': cols[0].span.a.string.strip(),
@@ -37,11 +38,13 @@ def getCases(html, name, names):
 def lookupCases(opener, name, court, division):
     cases = []
 
-    data = urllib.urlencode({'category': division,
-        'lastName':name,
-        'courtId':court,
-        'submitValue':'N'})
-    searchResults = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
+    data = urllib.urlencode({
+        'category': division,
+        'lastName': name,
+        'courtId': court,
+        'submitValue': 'N'})
+    cases_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/Search.do"
+    searchResults = opener.open(cases_url, data)
     html = searchResults.read()
     done = getCases(BeautifulSoup(html), name, cases)
 
