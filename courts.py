@@ -134,8 +134,10 @@ def searchCourt(name, court):
     place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
 
     courtSearch = {'name': court[5:], 'id': courtId}
-    courtSearch['criminalCases'] = lookupCases(opener, name.upper(), courtId, 'R')
-    courtSearch['civilCases'] = lookupCases(opener, name.upper(), courtId, 'CIVIL')
+    courtSearch['criminalCases'] = lookupCases(opener, name.upper(),
+                                               courtId, 'R')
+    courtSearch['civilCases'] = lookupCases(opener, name.upper(),
+                                            courtId, 'CIVIL')
 
     if 'Virginia Beach' in court:
         courtSearch['criminalCases'].extend(lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
