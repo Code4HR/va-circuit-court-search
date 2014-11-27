@@ -144,8 +144,10 @@ def searchCourt(name, court):
                                             courtId, 'CIVIL')
 
     if 'Virginia Beach' in court:
-        courtSearch['criminalCases'].extend(lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
-        courtSearch['civilCases'].extend(lookupCasesInVirginiaBeach(name, 'CIVIL'))
+        courtSearch['criminalCases'].extend(
+            lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
+        courtSearch['civilCases'].extend(
+            lookupCasesInVirginiaBeach(name, 'CIVIL'))
 
     return render_template('court.html', court=courtSearch)
 
