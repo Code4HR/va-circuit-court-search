@@ -99,8 +99,9 @@ def getCasesInVirginiaBeach(html, name, names):
 def lookupCasesInVirginiaBeach(name, division):
     cases = []
 
-    url = 'https://vbcircuitcourt.com/public/search.do?searchType=1&indexName=publiccasesearch&q=' + name.replace(' ', '+')
-    url = url + '%20FilterByCourtType:"' + division + '"'
+    url = u'https://vbcircuitcourt.com/public/search.do?searchType=1' + \
+        u'&indexName=publiccasesearch&q=' + name.replace(' ', '+') + \
+        u'%20FilterByCourtType:"' + division + u'"'
 
     searchResults = urllib2.urlopen(url)
     html = searchResults.read()
