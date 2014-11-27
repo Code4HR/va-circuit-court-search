@@ -48,17 +48,18 @@ def lookupCases(opener, name, court, division):
     html = searchResults.read()
     done = getCases(BeautifulSoup(html), name, cases)
 
-    data = urllib.urlencode({'courtId':court,
-        'pagelink':'Next',
-        'lastCaseProcessed':'',
-        'firstCaseProcessed':'',
-        'lastNameProcessed':'',
-        'firstNameProcessed':'',
+    data = urllib.urlencode({
+        'courtId': court,
+        'pagelink': 'Next',
+        'lastCaseProcessed': '',
+        'firstCaseProcessed': '',
+        'lastNameProcessed': '',
+        'firstNameProcessed': '',
         'category': division,
-        'firstCaseSerialNumber':0,
-        'lastCaseSerialNumber':0,
-        'searchType':'',
-        'emptyList':''})
+        'firstCaseSerialNumber': 0,
+        'lastCaseSerialNumber': 0,
+        'searchType': '',
+        'emptyList': ''})
 
     count = 1
     while(not done and count < 6):
