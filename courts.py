@@ -124,12 +124,13 @@ def searchCourt(name, court):
         cookieJar.set_cookie(cookie)
 
     courtId = court[:3]
-    data = urllib.urlencode({'courtId':courtId,
-        'courtType':'C',
-        'caseType':'ALL',
-        'testdos':False,
-        'sessionCreate':'NEW',
-        'whichsystem':court})
+    data = urllib.urlencode({
+        'courtId': courtId,
+        'courtType': 'C',
+        'caseType': 'ALL',
+        'testdos': False,
+        'sessionCreate': 'NEW',
+        'whichsystem': court})
     place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
 
     courtSearch = {'name': court[5:], 'id': courtId}
