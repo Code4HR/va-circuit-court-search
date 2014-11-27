@@ -158,7 +158,11 @@ def search(name):
     courts = []
     html = BeautifulSoup(home.read())
     for option in html.find_all('option'):
-        courts.append({'fullName': option['value'], 'id': option['value'][:3], 'name': option['value'][5:]})
+        courts.append({
+            'fullName': option['value'],
+            'id': option['value'][:3],
+            'name': option['value'][5:]
+        })
 
     return render_template('search.html', data={'name': name.upper(), 'courts': courts})
 
