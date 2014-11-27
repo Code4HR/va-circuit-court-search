@@ -1,11 +1,10 @@
-import scraperwiki
-import cookielib, urllib, urllib2
-import json
+import cookielib
+import urllib
+import urllib2
 import os
-import flask
 import pickle
 from bs4 import BeautifulSoup
-from flask import Flask, session, Response, render_template
+from flask import Flask, session, render_template
 
 app = Flask(__name__)
 
@@ -17,7 +16,7 @@ def getCases(html, name, names):
                 return True
             names.append({
                 'caseNumber': cols[0].span.a.string.strip(),
-                'name': cols[1].string.strip(), 
+                'name': cols[1].string.strip(),
                 'charge': cols[2].string.strip(),
                 'date': cols[3].string.strip(),
                 'status': cols[4].string.strip()
@@ -27,16 +26,16 @@ def getCases(html, name, names):
                 return True
             names.append({
                 'caseNumber': cols[0].span.a.string.strip(),
-                'name': cols[1].get_text(), 
+                'name': cols[1].get_text(),
                 'otherName': cols[2].get_text(),
                 'status': cols[3].string.strip()
             })
     return False
 
 
-def lookupCases(opener, name, court, division):    
+def lookupCases(opener, name, court, division):
     cases = []
-    
+
     data = urllib.urlencode({'category': division,
         'lastName':name,
         'courtId':court,
@@ -44,7 +43,7 @@ def lookupCases(opener, name, court, division):
     searchResults = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
     html = searchResults.read()
     done = getCases(BeautifulSoup(html), name, cases)
-    
+
     data = urllib.urlencode({'courtId':court,
         'pagelink':'Next',
         'lastCaseProcessed':'',
@@ -56,7 +55,7 @@ def lookupCases(opener, name, court, division):
         'lastCaseSerialNumber':0,
         'searchType':'',
         'emptyList':''})
-    
+
     count = 1
     while(not done and count < 6):
         searchResults = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
@@ -69,31 +68,31 @@ def getCasesInVirginiaBeach(html, name, names):
     resultsTable = html.find(class_="tablesorter")
     if resultsTable is None:
         return True
-    
+
     for row in resultsTable.find('tbody').find_all('tr'):
         cols = row.find_all('td')
         if len(cols) > 5:
             names.append({
                 'caseNumber': cols[0].a.string or '',
                 'link': 'https://vbcircuitcourt.com' + cols[0].a['href'],
-                'otherName': cols[1].string or '', 
+                'otherName': cols[1].string or '',
                 'caseStyle': ''.join(cols[2].findAll(text=True)).replace('\r\n', ' ') or '',
                 'name': ''.join(cols[3].findAll(text=True)).replace('\r\n', ' ') or '',
                 'partyType': cols[4].string.capitalize() + ':',
                 'status': cols[5].string or ''
             })
     return False
-    
-def lookupCasesInVirginiaBeach(name, division):    
+
+def lookupCasesInVirginiaBeach(name, division):
     cases = []
-    
+
     url = 'https://vbcircuitcourt.com/public/search.do?searchType=1&indexName=publiccasesearch&q=' + name.replace(' ', '+')
     url = url + '%20FilterByCourtType:"' + division + '"'
-    
+
     searchResults = urllib2.urlopen(url)
     html = searchResults.read()
     done = getCasesInVirginiaBeach(BeautifulSoup(html), name, cases)
-    
+
     count = 1
     while(not done and count < 6):
         searchResults = urllib2.urlopen(url + '&start=' + str(count * 30))
@@ -106,13 +105,13 @@ def lookupCasesInVirginiaBeach(name, division):
 def searchCourt(name, court):
     if 'cookies' not in session:
         return "Error. Please reload the page."
-    
+
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
     opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11')]
     for cookie in pickle.loads(session['cookies']):
         cookieJar.set_cookie(cookie)
-    
+
     courtId = court[:3]
     data = urllib.urlencode({'courtId':courtId,
         'courtType':'C',
@@ -121,31 +120,31 @@ def searchCourt(name, court):
         'sessionCreate':'NEW',
         'whichsystem':court})
     place = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do', data)
-    
+
     courtSearch = {'name': court[5:], 'id': courtId}
     courtSearch['criminalCases'] = lookupCases(opener, name.upper(), courtId, 'R')
     courtSearch['civilCases'] = lookupCases(opener, name.upper(), courtId, 'CIVIL')
-    
+
     if 'Virginia Beach' in court:
         courtSearch['criminalCases'].extend(lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
         courtSearch['civilCases'].extend(lookupCasesInVirginiaBeach(name, 'CIVIL'))
-    
+
     return render_template('court.html', court=courtSearch)
-    
+
 @app.route("/search/<name>")
 def search(name):
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
     opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11')]
     home = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/circuit.jsp')
-    
+
     session['cookies'] = pickle.dumps(list(cookieJar))
-    
+
     courts = []
     html = BeautifulSoup(home.read())
     for option in html.find_all('option'):
         courts.append({'fullName': option['value'], 'id': option['value'][:3], 'name': option['value'][5:]})
-        
+
     return render_template('search.html', data={'name': name.upper(), 'courts': courts})
 
 @app.route("/")
