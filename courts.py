@@ -83,8 +83,10 @@ def getCasesInVirginiaBeach(html, name, names):
                 'caseNumber': cols[0].a.string or '',
                 'link': 'https://vbcircuitcourt.com' + cols[0].a['href'],
                 'otherName': cols[1].string or '',
-                'caseStyle': ''.join(cols[2].findAll(text=True)).replace('\r\n', ' ') or '',
-                'name': ''.join(cols[3].findAll(text=True)).replace('\r\n', ' ') or '',
+                'caseStyle': ''.join(cols[2].findAll(text=True))
+                .replace('\r\n', ' ') or '',
+                'name': ''.join(cols[3].findAll(text=True))
+                .replace('\r\n', ' ') or '',
                 'partyType': cols[4].string.capitalize() + ':',
                 'status': cols[5].string or ''
             })
