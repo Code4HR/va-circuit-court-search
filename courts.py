@@ -163,8 +163,8 @@ def search(name):
             'id': option['value'][:3],
             'name': option['value'][5:]
         })
-
-    return render_template('search.html', data={'name': name.upper(), 'courts': courts})
+    data = {'name': name.upper(), 'courts': courts}
+    return render_template('search.html', data=data)
 
 
 @app.route("/")
