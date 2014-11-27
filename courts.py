@@ -62,9 +62,10 @@ def lookupCases(opener, name, court, division):
         'emptyList': ''})
 
     count = 1
+    search_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/Search.do"
     while(not done and count < 6):
-        searchResults = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/Search.do', data)
-        html = searchResults.read()
+        search_results = opener.open(search_url, data)
+        html = search_results.read()
         done = getCases(BeautifulSoup(html), name, cases)
         count += 1
     return cases
