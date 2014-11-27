@@ -8,6 +8,7 @@ from flask import Flask, session, render_template
 
 app = Flask(__name__)
 
+
 def getCases(html, name, names):
     for row in html.find(class_="nameList").find_all('tr'):
         cols = row.find_all('td')
@@ -64,6 +65,7 @@ def lookupCases(opener, name, court, division):
         count += 1
     return cases
 
+
 def getCasesInVirginiaBeach(html, name, names):
     resultsTable = html.find(class_="tablesorter")
     if resultsTable is None:
@@ -83,6 +85,7 @@ def getCasesInVirginiaBeach(html, name, names):
             })
     return False
 
+
 def lookupCasesInVirginiaBeach(name, division):
     cases = []
 
@@ -100,6 +103,7 @@ def lookupCasesInVirginiaBeach(name, division):
         done = getCasesInVirginiaBeach(BeautifulSoup(html), name, cases)
         count += 1
     return cases
+
 
 @app.route("/search/<name>/court/<path:court>")
 def searchCourt(name, court):
@@ -131,6 +135,7 @@ def searchCourt(name, court):
 
     return render_template('court.html', court=courtSearch)
 
+
 @app.route("/search/<name>")
 def search(name):
     cookieJar = cookielib.CookieJar()
@@ -146,6 +151,7 @@ def search(name):
         courts.append({'fullName': option['value'], 'id': option['value'][:3], 'name': option['value'][5:]})
 
     return render_template('search.html', data={'name': name.upper(), 'courts': courts})
+
 
 @app.route("/")
 def index():
