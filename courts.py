@@ -8,6 +8,9 @@ from flask import Flask, session, render_template
 
 app = Flask(__name__)
 
+user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
+    u"rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11"
+
 
 def getCases(html, name, names):
     for row in html.find(class_="nameList").find_all('tr'):
@@ -119,7 +122,8 @@ def searchCourt(name, court):
 
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
-    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11')]
+    opener.addheaders = [('User-Agent', user_agent)]
+
     for cookie in pickle.loads(session['cookies']):
         cookieJar.set_cookie(cookie)
 
@@ -150,7 +154,8 @@ def searchCourt(name, court):
 def search(name):
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
-    opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11')]
+    opener.addheaders = [('User-Agent', user_agent)]
+
     home = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/circuit.jsp')
 
     session['cookies'] = pickle.dumps(list(cookieJar))
