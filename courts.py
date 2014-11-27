@@ -137,7 +137,8 @@ def searchCourt(name, court):
         'sessionCreate': 'NEW',
         'whichsystem': court})
     place_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do"
-    place = opener.open(place_url, data)
+    # place = opener.open(place_url, data)
+    opener.open(place_url, data)
 
     courtSearch = {'name': court[5:], 'id': courtId}
     courtSearch['criminalCases'] = lookupCases(opener, name.upper(),
