@@ -19,6 +19,15 @@ brew install python
 pip install -r requirements.txt
 ```
 
+* Set MongoDB instance
+```
+$ export MONGO_URI=mongodb://<dbuser>:<dbpassword>@ds027761.mongolab.com:27761/va-circuit-court-search
+```
+-OR-  for Windows
+```
+$ set MONGO_URI=mongodb://<dbuser>:<dbpassword>@ds027761.mongolab.com:27761/va-circuit-court-search
+```
+
 * Run the server
 ```
 python courts.py

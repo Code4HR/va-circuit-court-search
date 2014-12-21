@@ -3,7 +3,9 @@ import urllib
 import urllib2
 import os
 import pickle
+import pymongo
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 from flask import Flask, session, render_template
 
 app = Flask(__name__)
@@ -124,7 +126,13 @@ def searchCourt(name, court):
     courtId = court[:3]
     courtSearch = {'name': court[5:], 'id': courtId}
     
-    if 'Virginia Beach' in court:
+    db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
+    cases = db['cases'].find_one({'name': name, 'court': court})
+    if cases is not None:
+        print 'Found cached search'
+        courtSearch['criminalCases'] = cases['criminalCases']
+        courtSearch['civilCases'] = cases['civilCases']
+    elif 'Virginia Beach' in court:
         courtSearch['criminalCases'] = lookupCasesInVirginiaBeach(name, 
                                                                   'CRIMINAL')
         courtSearch['civilCases'] = lookupCasesInVirginiaBeach(name, 'CIVIL')
@@ -151,11 +159,25 @@ def searchCourt(name, court):
         courtSearch['civilCases'] = lookupCases(opener, name.upper(),
                                                 courtId, 'CIVIL')
     
+    if cases is None:
+        print 'Caching search'
+        db['cases'].insert({
+            'name': name,
+            'court': court,
+            'criminalCases': courtSearch['criminalCases'],
+            'civilCases': courtSearch['civilCases'],
+            'dateSaved': datetime.utcnow()
+        })
     return render_template('court.html', court=courtSearch)
 
 
 @app.route("/search/<name>")
 def search(name):
+    db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
+    db['cases'].remove({
+        'dateSaved': {'$lt': datetime.utcnow() + timedelta(minutes=-60)}
+    })
+    
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
     opener.addheaders = [('User-Agent', user_agent)]
