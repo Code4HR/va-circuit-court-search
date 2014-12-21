@@ -120,38 +120,37 @@ def lookupCasesInVirginiaBeach(name, division):
 def searchCourt(name, court):
     if 'cookies' not in session:
         return "Error. Please reload the page."
-
-    cookieJar = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
-    opener.addheaders = [('User-Agent', user_agent)]
-
-    for cookie in pickle.loads(session['cookies']):
-        cookieJar.set_cookie(cookie)
-
+    
     courtId = court[:3]
-    data = urllib.urlencode({
-        'courtId': courtId,
-        'courtType': 'C',
-        'caseType': 'ALL',
-        'testdos': False,
-        'sessionCreate': 'NEW',
-        'whichsystem': court})
-    place_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do"
-    # place = opener.open(place_url, data)
-    opener.open(place_url, data)
-
     courtSearch = {'name': court[5:], 'id': courtId}
-    courtSearch['criminalCases'] = lookupCases(opener, name.upper(),
-                                               courtId, 'R')
-    courtSearch['civilCases'] = lookupCases(opener, name.upper(),
-                                            courtId, 'CIVIL')
-
+    
     if 'Virginia Beach' in court:
-        courtSearch['criminalCases'].extend(
-            lookupCasesInVirginiaBeach(name, 'CRIMINAL'))
-        courtSearch['civilCases'].extend(
-            lookupCasesInVirginiaBeach(name, 'CIVIL'))
-
+        courtSearch['criminalCases'] = lookupCasesInVirginiaBeach(name, 
+                                                                  'CRIMINAL')
+        courtSearch['civilCases'] = lookupCasesInVirginiaBeach(name, 'CIVIL')
+    else:
+        cookieJar = cookielib.CookieJar()
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
+        opener.addheaders = [('User-Agent', user_agent)]
+        
+        for cookie in pickle.loads(session['cookies']):
+            cookieJar.set_cookie(cookie)
+        
+        data = urllib.urlencode({
+            'courtId': courtId,
+            'courtType': 'C',
+            'caseType': 'ALL',
+            'testdos': False,
+            'sessionCreate': 'NEW',
+            'whichsystem': court})
+        place_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do"
+        opener.open(place_url, data)
+        
+        courtSearch['criminalCases'] = lookupCases(opener, name.upper(),
+                                                   courtId, 'R')
+        courtSearch['civilCases'] = lookupCases(opener, name.upper(),
+                                                courtId, 'CIVIL')
+    
     return render_template('court.html', court=courtSearch)
 
 
