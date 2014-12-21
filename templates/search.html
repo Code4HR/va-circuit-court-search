@@ -56,7 +56,11 @@
         <div id="{{ court.id }}">
             <h2>{{ court.name }}</h2>
             <div class="search-result">
-                <div class="text-muted search-pending"><i class="fa fa-spinner fa-spin"></i> Loading</div>
+		{% if 'criminalCases' in court %}
+			{% include "court.html" %}
+		{% else %}
+                	<div class="text-muted search-pending"><i class="fa fa-spinner fa-spin"></i> Loading</div>
+		{% endif %}
             </div>
         </div>
     {% endfor %}
@@ -94,19 +98,23 @@
         
         $('#countSearched').text(courtCount - courts.length);
         
-        setTimeout(function() {
-            $.get('/search/' + name + '/court/' + court.fullName, function(data) {
-                var selector = '#' + court.id + ' .search-result';
-                $(selector).html(data);
-            })
-            .fail(function() {
-                var retryFunction = "retry('" + court.fullName + "','" + court.id + "')";
-                $('#' + court.id + ' .search-result').html('<div>Error</div><div><button class="btn" onclick="' + retryFunction + '">Retry</button></div>');
-            })
-            .always(function() {
-                courtSearch();
-            })
-        }, 1000);
+	if('criminalCases' in court) {
+		courtSearch();
+	} else {
+	        setTimeout(function() {
+	            $.get('/search/' + name + '/court/' + court.fullName, function(data) {
+	                var selector = '#' + court.id + ' .search-result';
+	                $(selector).html(data);
+	            })
+	            .fail(function() {
+	                var retryFunction = "retry('" + court.fullName + "','" + court.id + "')";
+	                $('#' + court.id + ' .search-result').html('<div>Error</div><div><button class="btn" onclick="' + retryFunction + '">Retry</button></div>');
+	            })
+	            .always(function() {
+	                courtSearch();
+	            })
+	        }, 1000);
+	}
     }
     
     function retry(fullName, id) {

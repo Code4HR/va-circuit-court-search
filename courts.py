@@ -175,7 +175,7 @@ def searchCourt(name, court):
 def search(name):
     db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
     db['cases'].remove({
-        'dateSaved': {'$lt': datetime.utcnow() + timedelta(minutes=-60)}
+        'dateSaved': {'$lt': datetime.utcnow() + timedelta(days=-60)}
     })
     
     cookieJar = cookielib.CookieJar()
@@ -195,6 +195,12 @@ def search(name):
             'name': option['value'][5:]
         })
     data = {'name': name.upper(), 'courts': courts}
+    cases = db['cases'].find({'name': name.upper()})
+    for case in cases:
+        for court in data['courts']:
+            if case['court'] == court['fullName']:
+                court['criminalCases'] = case['criminalCases']
+                court['civilCases'] = case['civilCases']
     return render_template('search.html', data=data)
 
 
