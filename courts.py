@@ -175,7 +175,7 @@ def searchCourt(name, court):
 def search(name):
     db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
     db['cases'].remove({
-        'dateSaved': {'$lt': datetime.utcnow() + timedelta(days=-60)}
+        'dateSaved': {'$lt': datetime.utcnow() + timedelta(days=-3)}
     })
     
     cookieJar = cookielib.CookieJar()
