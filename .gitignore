@@ -56,3 +56,6 @@ target/
 # vim-python-mode
 .ropeproject/
 *.swp
+
+# Project specific
+files/

@@ -1,0 +1,103 @@
+import cookielib
+import os
+import re
+import urllib
+import urllib2
+from bs4 import BeautifulSoup
+
+user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
+    u"rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11"
+
+# Get cookie and list of courts
+cookieJar = cookielib.CookieJar()
+opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
+opener.addheaders = [('User-Agent', user_agent)]
+
+home = opener.open('http://ewsocis1.courts.state.va.us/CJISWeb/circuit.jsp')
+
+courts = []
+html = BeautifulSoup(home.read())
+for option in html.find_all('option'):
+    courts.append({
+        'fullName': option['value'],
+        'id': option['value'][:3],
+        'name': option['value'][5:]
+    })
+
+# Go to court
+for court in courts:
+    print court['name']
+    file_path = 'files/' + court['name'].replace(' ', '').replace('/', '') + '/'
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+    data = urllib.urlencode({
+        'courtId': court['id'],
+        'courtType': 'C',
+        'caseType': 'ALL',
+        'testdos': False,
+        'sessionCreate': 'NEW',
+        'whichsystem': court['fullName']})
+    place_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do"
+    opener.open(place_url, data)
+    
+    # search by case numbers
+    search_next_case = True
+    case_count = 0
+    while search_next_case:
+        case_count += 1
+        case_number = 'CR14' + format(case_count, '06')
+        
+        search_next_specific_case = True
+        specific_case_count = 0
+        while search_next_specific_case:
+            specific_case_count += 1
+            specific_case_number = case_number + '-' + format(specific_case_count, '02')
+            
+            # get case info
+            data = urllib.urlencode({
+                'categorySelected': 'R',
+                'caseNo': specific_case_number,
+                'courtId': court['id'],
+                'submitValue': ''})
+            cases_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/CaseDetail.do"
+            case_details = opener.open(cases_url, data)
+            html = BeautifulSoup(case_details.read())
+            case_exists = html.find(text=re.compile('Case not found')) is None
+            
+            if case_exists:
+                print 'Found ' + specific_case_number
+                filename = file_path + specific_case_number + '.html'
+                with open(filename, 'w') as text_file:
+                    text_file.write(html.prettify().encode('UTF-8'))
+                
+                data = urllib.urlencode({
+                    'categorySelected': 'R',
+                    'caseStatus':'A',
+                    'caseNo': specific_case_number,
+                    'courtId': court['id'],
+                    'submitValue': 'P'})
+                case_details = opener.open(cases_url, data)
+                html = BeautifulSoup(case_details.read())
+                filename = file_path + specific_case_number + '_pleadings.html'
+                with open(filename, 'w') as text_file:
+                    text_file.write(html.prettify().encode('UTF-8'))
+                
+                data = urllib.urlencode({
+                    'categorySelected': 'R',
+                    'caseStatus':'A',
+                    'caseNo': specific_case_number,
+                    'courtId': court['id'],
+                    'submitValue': 'S'})
+                case_details = opener.open(cases_url, data)
+                html = BeautifulSoup(case_details.read())
+                filename = file_path + specific_case_number + '_services.html'
+                with open(filename, 'w') as text_file:
+                    text_file.write(html.prettify().encode('UTF-8'))
+                    
+                data = urllib.urlencode({'courtId': court['id']})
+                opener.open(place_url, data)
+            else:
+                print 'Cound not find ' + specific_case_number
+                search_next_specific_case = False
+                if specific_case_count == 1:
+                    search_next_case = False
