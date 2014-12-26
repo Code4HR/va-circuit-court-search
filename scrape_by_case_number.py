@@ -8,6 +8,10 @@ from bs4 import BeautifulSoup
 user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
     u"rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11"
 
+def getFilePath(court_name):
+    court_name = court_name.replace(' ', '').replace('/', '')
+    return 'files/' + court_name + '/'
+
 # Get cookie and list of courts
 cookieJar = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
@@ -25,11 +29,16 @@ for option in html.find_all('option'):
     })
 
 # Go to court
-for court in courts:
+for index, court in enumerate(courts):
     print court['name']
-    file_path = 'files/' + court['name'].replace(' ', '').replace('/', '') + '/'
+    file_path = getFilePath(court['name'])
     if not os.path.exists(file_path):
         os.makedirs(file_path)
+    elif len(courts) > index + 1:
+        next_file_path = getFilePath(courts[index+1]['name'])
+        if os.path.exists(next_file_path):
+            continue
+    
     data = urllib.urlencode({
         'courtId': court['id'],
         'courtType': 'C',
@@ -109,5 +118,5 @@ for court in courts:
                     search_next_specific_case = False
                 if specific_case_count == 1:
                     sequential_cases_missed_count += 1
-                    if sequential_cases_missed_count > 99:
+                    if sequential_cases_missed_count > 9:
                         search_next_case = False
