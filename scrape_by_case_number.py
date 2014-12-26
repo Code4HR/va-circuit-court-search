@@ -41,9 +41,8 @@ for court in courts:
     opener.open(place_url, data)
     
     # search by case numbers
-    
     sequential_cases_missed_count = 0
-    case_count = 0
+    case_count = -1
     file_list = os.listdir(file_path)
     if len(file_list) > 0:
         case_count = int(file_list[-1][4:10]) - 1
@@ -54,7 +53,7 @@ for court in courts:
         case_number = 'CR14' + format(case_count, '06')
         
         search_next_specific_case = True
-        specific_case_count = 0
+        specific_case_count = -1
         while search_next_specific_case:
             specific_case_count += 1
             specific_case_number = case_number + '-' + format(specific_case_count, '02')
@@ -105,7 +104,9 @@ for court in courts:
                 data = urllib.urlencode({'courtId': court['id']})
                 opener.open(place_url, data)
             else:
-                search_next_specific_case = False
+                print 'Could not find ' + specific_case_number
+                if specific_case_count > 0:
+                    search_next_specific_case = False
                 if specific_case_count == 1:
                     sequential_cases_missed_count += 1
                     if sequential_cases_missed_count > 99:
