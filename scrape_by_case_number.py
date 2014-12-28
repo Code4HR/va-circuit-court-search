@@ -142,3 +142,5 @@ while True:
         raise
     except:
         print "Unexpected error:", sys.exc_info()
+        print 'Restarting in 30 seconds'
+        sleep(30)
