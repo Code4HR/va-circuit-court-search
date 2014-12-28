@@ -78,13 +78,14 @@ def run():
                     'submitValue': ''})
                 cases_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/CaseDetail.do"
                 case_details = opener.open(cases_url, data)
-                case_details_str = case_details.read()
-                if case_details_str == '':
-                    raise Exception('Read case details failed')
-                html = BeautifulSoup(case_details_str)
-                case_exists = html.find(text=re.compile('Case not found')) is None
+                html = BeautifulSoup(case_details.read())
                 
+                case_exists = html.find(text=re.compile('Case not found')) is None
                 if case_exists:
+                    html_is_invalid = html.find(text=re.compile(specific_case_number)) is None
+                    if html_is_invalid:
+                        raise Exception('Case detail HTML is invalid')
+                    
                     print 'Found ' + specific_case_number
                     sequential_cases_missed_count = 0
                     
@@ -99,10 +100,10 @@ def run():
                         'courtId': court['id'],
                         'submitValue': 'P'})
                     case_details = opener.open(cases_url, data)
-                    case_details_str = case_details.read()
-                    if case_details_str == '':
-                        raise Exception('Read case details failed')
-                    html = BeautifulSoup(case_details_str)
+                    html = BeautifulSoup(case_details.read())
+                    html_is_invalid = html.find(text=re.compile(specific_case_number)) is None
+                    if html_is_invalid:
+                        raise Exception('Case detail pleadings HTML is invalid')
                     filename = file_path + specific_case_number + '_pleadings.html'
                     with open(filename, 'w') as text_file:
                         text_file.write(html.prettify().encode('UTF-8'))
@@ -114,10 +115,10 @@ def run():
                         'courtId': court['id'],
                         'submitValue': 'S'})
                     case_details = opener.open(cases_url, data)
-                    case_details_str = case_details.read()
-                    if case_details_str == '':
-                        raise Exception('Read case details failed')
-                    html = BeautifulSoup(case_details_str)
+                    html = BeautifulSoup(case_details.read())
+                    html_is_invalid = html.find(text=re.compile(specific_case_number)) is None
+                    if html_is_invalid:
+                        raise Exception('Case detail services HTML is invalid')
                     filename = file_path + specific_case_number + '_services.html'
                     with open(filename, 'w') as text_file:
                         text_file.write(html.prettify().encode('UTF-8'))
@@ -140,4 +141,4 @@ while True:
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
-        print "Unexpected error:", sys.exc_info()[0]
+        print "Unexpected error:", sys.exc_info()
