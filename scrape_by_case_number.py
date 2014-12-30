@@ -12,7 +12,7 @@ user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
 
 def getFilePath(court_name):
     court_name = court_name.replace(' ', '').replace('/', '')
-    return 'files/' + court_name + '/'
+    return '../va-circuit-court-search-files/' + court_name + '/'
 
 def run():
     # Get cookie and list of courts
@@ -68,6 +68,8 @@ def run():
             specific_case_count = -1
             while search_next_specific_case:
                 specific_case_count += 1
+                if specific_case_count > 99:
+                    break
                 specific_case_number = case_number + '-' + format(specific_case_count, '02')
                 
                 # get case info
@@ -138,9 +140,11 @@ def run():
 while True:
     try:
         run()
+        break
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
         print "Unexpected error:", sys.exc_info()
         print 'Restarting in 30 seconds'
         sleep(30)
+print 'Done!'
