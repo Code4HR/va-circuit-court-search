@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from datetime import datetime
 import os
+import pymongo
 import re
 from pprint import pprint
 
@@ -24,14 +25,16 @@ def get_hearings_from_table(case, table):
     for row in rows:
         hearing = {}
         for i, col in enumerate(row.find_all('td')):
-            hearing[col_names[i]] = col.get_text(strip=True) \
-                                       .encode('ascii', 'ignore')
+            val = col.get_text(strip=True) \
+                     .encode('ascii', 'ignore')
+            if val != '':
+                hearing[col_names[i]] = val
         hearing_dt = hearing['Date'] + hearing['Time']
         hearing['Datetime'] = datetime.strptime(hearing_dt, "%m/%d/%Y%I:%M%p")
         case['Hearings'].append(hearing)
 
 def value_to_datetime(case, name):
-    case[name] = datetime.strptime(case[name], "%m/%d/%Y").date()
+    case[name] = datetime.strptime(case[name], "%m/%d/%Y")
 
 def process_case_details(case, html):
     tables = html.find_all('table')
@@ -70,8 +73,10 @@ def process_case_pleadings(case, html):
     for row in rows:
         pleadings = {}
         for i, col in enumerate(row.find_all('td')):
-            pleadings[col_names[i]] = col.get_text(strip=True) \
-                                         .encode('ascii', 'ignore')
+            val = col.get_text(strip=True) \
+                     .encode('ascii', 'ignore')
+            if val != '':
+                pleadings[col_names[i]] = val
         value_to_datetime(pleadings, 'Filed')
         case['Pleadings'].append(pleadings)
 
@@ -89,31 +94,59 @@ def process_case_services(case, html):
     for row in rows:
         services = {}
         for i, col in enumerate(row.find_all('td')):
-            services[col_names[i]] = col.get_text(strip=True) \
-                                        .encode('ascii', 'ignore')
-        if services['HearDate'] != '':
+            val = col.get_text(strip=True) \
+                     .encode('ascii', 'ignore')
+            if val != '':
+                services[col_names[i]] = val
+        if 'HearDate' in services:
             value_to_datetime(services, 'HearDate')
-        if services['DateServed'] != '':
+        if 'DateServed' in services:
             value_to_datetime(services, 'DateServed')
         case['Services'].append(services)
+
+client = pymongo.MongoClient('mongodb://localhost:27017/')
+db = client.va_circuit_court
+
+last_locality = sorted(db.criminal_cases.distinct('Court'))[-1]
+last_case_number = db.criminal_cases.find_one({'Court': last_locality}, \
+                    sort=[('CaseNumber', pymongo.DESCENDING)])['CaseNumber']
+
+skip_directory = True
+skip_case = True
 
 base_path = '../va-circuit-court-search-files/'
 locality_directories = os.walk(base_path).next()[1]
 for directory in locality_directories:
+    if last_locality == directory:
+        skip_directory = False
+    if skip_directory: continue
+    
     filenames = os.listdir(base_path + directory)
     for filename in filenames:
-        print directory + ' - ' + filename
+        if last_case_number in filename:
+            skip_case = False
+        if skip_case: continue
+        
         cur_path = base_path + directory + '/' + filename
         with open(cur_path, 'r') as f:
-            case = {}
+            print cur_path
+            case = {'Court': directory}
             html = BeautifulSoup(f.read())
             
             if 'pleadings' in filename:
                 process_case_pleadings(case, html)
             elif 'services' in filename:
                 process_case_services(case, html)
-            else:
+            elif '.html' in filename:
                 process_case_details(case, html)
+            else:
+                print 'Skipping unsupported file'
+                continue
             
-    break
+            db.criminal_cases.update({
+                'Court': case['Court'],
+                'CaseNumber': case['CaseNumber']
+            }, {
+                '$set': case
+            }, upsert = True)
 print 'Done'
