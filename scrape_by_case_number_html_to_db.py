@@ -33,6 +33,28 @@ def get_hearings_from_table(case, table):
 def value_to_datetime(case, name):
     case[name] = datetime.strptime(case[name], "%m/%d/%Y").date()
 
+def process_case_details(case, html):
+    tables = html.find_all('table')
+    details_table = tables[4]
+    hearings_table = tables[6]
+    final_disposition_table = tables[8]
+    sentencing_table = tables[9]
+    appeal_table = tables[10]
+    
+    get_data_from_table(case, details_table)
+    get_data_from_table(case, final_disposition_table)
+    get_data_from_table(case, sentencing_table)
+    get_hearings_from_table(case, hearings_table)
+    
+    if 'Filed' in case:
+        value_to_datetime(case, 'Filed')
+    if 'OffenseDate' in case:
+        value_to_datetime(case, 'OffenseDate')
+    if 'ArrestDate' in case: 
+        value_to_datetime(case, 'ArrestDate')
+    if 'DispositionDate' in case:
+        value_to_datetime(case, 'DispositionDate')
+
 base_path = '../va-circuit-court-search-files/'
 locality_directories = os.walk(base_path).next()[1]
 for directory in locality_directories:
@@ -42,27 +64,15 @@ for directory in locality_directories:
         print cur_path
         with open(cur_path, 'r') as f:
             case = {}
-            
             html = BeautifulSoup(f.read())
             
-            tables = html.find_all('table')
-            details_table = tables[4]
-            hearings_table = tables[6]
-            final_disposition_table = tables[8]
-            sentencing_table = tables[9]
-            appeal_table = tables[10]
-            
-            get_data_from_table(case, details_table)
-            get_data_from_table(case, final_disposition_table)
-            get_data_from_table(case, sentencing_table)
-            get_hearings_from_table(case, hearings_table)
-            
-            value_to_datetime(case, 'Filed')
-            value_to_datetime(case, 'OffenseDate')
-            value_to_datetime(case, 'ArrestDate')
-            value_to_datetime(case, 'DispositionDate')
+            if 'pleadings' in filename:
+                print 'process pleadings'
+            elif 'services' in filename:
+                print 'process services'
+            else:
+                process_case_details(case, html)
             
             print pprint(case)
-        break
     break
 print 'Done'
