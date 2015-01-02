@@ -104,15 +104,22 @@ def process_case_services(case, html):
             value_to_datetime(services, 'DateServed')
         case['Services'].append(services)
 
-client = pymongo.MongoClient('mongodb://localhost:27017/')
+client = pymongo.MongoClient('mongodb://ben:cfa123@ds029801.mongolab.com:29801/va_circuit_court')
 db = client.va_circuit_court
-
-last_locality = sorted(db.criminal_cases.distinct('Court'))[-1]
-last_case_number = db.criminal_cases.find_one({'Court': last_locality}, \
-                    sort=[('CaseNumber', pymongo.DESCENDING)])['CaseNumber']
 
 skip_directory = True
 skip_case = True
+last_locality = ''
+last_case_number = ''
+
+courts_in_db = sorted(db.criminal_cases.distinct('Court'))
+if len(courts_in_db) < 1:
+    skip_directory = False
+    skip_case = False
+else:
+    last_locality = courts_in_db[-1]
+    last_case_number = db.criminal_cases.find_one({'Court': last_locality}, \
+                        sort=[('CaseNumber', pymongo.DESCENDING)])['CaseNumber']
 
 base_path = '../va-circuit-court-search-files/'
 locality_directories = os.walk(base_path).next()[1]
