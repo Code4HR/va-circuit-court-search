@@ -2,7 +2,7 @@ import pymongo
 from bson.son import SON
 from pprint import pprint
 
-client = pymongo.MongoClient('mongodb://ben:cfa123@ds029801.mongolab.com:29801/va_circuit_court')
+client = pymongo.MongoClient()
 db = client.va_circuit_court
 pprint(db.criminal_cases.aggregate([
     {'$group':{

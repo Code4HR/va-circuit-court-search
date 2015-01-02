@@ -104,7 +104,7 @@ def process_case_services(case, html):
             value_to_datetime(services, 'DateServed')
         case['Services'].append(services)
 
-client = pymongo.MongoClient('mongodb://ben:cfa123@ds029801.mongolab.com:29801/va_circuit_court')
+client = pymongo.MongoClient()
 db = client.va_circuit_court
 
 skip_directory = True

@@ -212,7 +212,7 @@ def index():
 
 @app.route("/test")
 def test():
-    client = pymongo.MongoClient('mongodb://ben:cfa123@ds029801.mongolab.com:29801/va_circuit_court')
+    client = pymongo.MongoClient()
     db = client.va_circuit_court
     courts = db.criminal_cases.aggregate([
         {'$group':{
