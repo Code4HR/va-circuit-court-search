@@ -54,6 +54,7 @@ def run():
     
     # Go to court
     for index, court in enumerate(courts):
+        #if 'Giles' not in court['name']: continue
         print court['name']
         file_path = getFilePath(court['name'])
         if not os.path.exists(file_path):
@@ -78,6 +79,7 @@ def run():
         case_count = -1
         file_list = os.listdir(file_path)
         for file_name in file_list:
+            if '.html' not in file_name: continue
             cur_count = int(file_name[5:10])
             if cur_count > case_count:
                 case_count = cur_count - 1
