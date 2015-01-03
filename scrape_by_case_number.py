@@ -10,26 +10,31 @@ from time import sleep
 user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
     u"rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11"
 
-courts_with_fm_case_number = [
-    'Charlotte Circuit Court',
-    'Chesterfield Circuit Court',
-    'Page Circuit Court',
-    'Richmond City Circuit Court',
-    'Wise Circuit Court'
-]
-
-def get_case_number_with_mf(case_number):
-    return [
-        case_number[:4] + 'M' + case_number[5:],
-        case_number[:4] + 'F' + case_number[5:]
-    ]
+courts_with_fm_case_number = {
+    'Charlotte Circuit Court': '5',
+    'Chesterfield Circuit Court': '5',
+    'Goochland Circuit Court': '0',
+    'LeeCircuitCourt': '4',
+    'Page Circuit Court': '5',
+    'Richmond City Circuit Court': '5',
+    'Wise Circuit Court': '5'
+}
 
 def get_case_number(court, case_count, charge_count):
-    case_number = 'CR14' + format(case_count, '06') + \
-        '-' + format(charge_count, '02')
+    prefix = 'CR14'
+    case = format(case_count, '06')
+    charge = '-' + format(charge_count, '02')
+    case_numbers = []
     if court in courts_with_fm_case_number:
-        return get_case_number_with_mf(case_number)
-    return [case_number]
+        case_length = courts_with_fm_case_number[court]
+        case = format(case_count, '0' + case_length)
+        case_f = str('F' + case).zfill(6)
+        case_m = str('M' + case).zfill(6)
+        case_numbers.append(prefix + case_f + charge)
+        case_numbers.append(prefix + case_m + charge)
+    else:
+        case_numbers.append(prefix + case + charge)
+    return case_numbers
 
 def getFilePath(court_name):
     court_name = court_name.replace(' ', '').replace('/', '')
@@ -109,7 +114,7 @@ def run():
                     case_exists = html.find(text=re.compile('Case not found')) is None
                     if case_exists:
                         break
-                    else:
+                    elif case_number != case_numbers[-1]:
                         print 'Could not find ' + case_number
                 
                 if case_exists:
