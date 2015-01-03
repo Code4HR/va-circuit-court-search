@@ -36,6 +36,26 @@ def get_hearings_from_table(case, table):
 def value_to_datetime(case, name):
     case[name] = datetime.strptime(case[name], "%m/%d/%Y")
 
+def dollars_to_cents(case, name):
+    case[name + 'Cents'] = int(round(float(case[name].strip('$'))*100))
+
+def time_to_days(case, name):
+    time_str = case[name]
+    if time_str == 'Indefinite':
+        return
+    time_str = time_str.split('(s)')
+    days = 0
+    for t in time_str:
+        if t == '': continue
+        duration = int(t.split(' ')[0])
+        durationType = t.split(' ')[1]
+        if durationType == 'Year':
+            duration *= 365
+        if durationType == 'Month':
+            duration *= 31
+        days += duration
+    case[name + 'Days'] = days
+
 def process_case_details(case, html):
     tables = html.find_all('table')
     details_table = tables[4]
@@ -50,7 +70,9 @@ def process_case_details(case, html):
     get_hearings_from_table(case, hearings_table)
     
     # TODO: handle appeal table... not sure what that looks like
+    #print list(appeal_table.stripped_strings)
     
+    # Convert datetimes
     if 'Filed' in case:
         value_to_datetime(case, 'Filed')
     if 'OffenseDate' in case:
@@ -59,6 +81,28 @@ def process_case_details(case, html):
         value_to_datetime(case, 'ArrestDate')
     if 'DispositionDate' in case:
         value_to_datetime(case, 'DispositionDate')
+    if 'RestrictionStartDate' in case:
+        value_to_datetime(case, 'RestrictionStartDate')
+    if 'RestrictionEndDate' in case:
+        value_to_datetime(case, 'RestrictionEndDate')
+    
+    # Convert dollars (str) to cents (int)
+    if 'FineAmount' in case:
+        dollars_to_cents(case, 'FineAmount')
+    if 'Costs' in case:
+        dollars_to_cents(case, 'Costs')
+    if 'RestitutionAmount' in case:
+        dollars_to_cents(case, 'RestitutionAmount')
+    
+    # Convert time str to days
+    if 'SentenceTime' in case:
+        time_to_days(case, 'SentenceTime')
+    if 'SentenceSuspended' in case:
+        time_to_days(case, 'SentenceSuspended')
+    if 'OperatorLicenseSuspensionTime' in case:
+        time_to_days(case, 'OperatorLicenseSuspensionTime')
+    if 'ProbationTime' in case:
+        time_to_days(case, 'ProbationTime')
 
 def process_case_pleadings(case, html):
     tables = html.find_all('table')
@@ -104,7 +148,7 @@ def process_case_services(case, html):
             value_to_datetime(services, 'DateServed')
         case['Services'].append(services)
 
-client = pymongo.MongoClient()
+client = pymongo.MongoClient(os.environ['MONGO_URI'])
 db = client.va_circuit_court
 
 skip_directory = True
@@ -126,17 +170,16 @@ locality_directories = os.walk(base_path).next()[1]
 for directory in locality_directories:
     if last_locality == directory:
         skip_directory = False
-    if skip_directory: continue
+    #if skip_directory: continue
     
     filenames = os.listdir(base_path + directory)
     for filename in filenames:
         if last_case_number in filename:
             skip_case = False
-        if skip_case: continue
+        #if skip_case: continue
         
         cur_path = base_path + directory + '/' + filename
         with open(cur_path, 'r') as f:
-            print cur_path
             case = {'Court': directory}
             html = BeautifulSoup(f.read())
             
@@ -145,6 +188,7 @@ for directory in locality_directories:
             elif 'services' in filename:
                 process_case_services(case, html)
             elif '.html' in filename:
+                print cur_path
                 process_case_details(case, html)
             else:
                 print 'Skipping unsupported file'
