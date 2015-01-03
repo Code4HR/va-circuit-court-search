@@ -14,7 +14,7 @@ courts_with_fm_case_number = {
     'Charlotte Circuit Court': '5',
     'Chesterfield Circuit Court': '5',
     'Goochland Circuit Court': '0',
-    'LeeCircuitCourt': '4',
+    'Lee Circuit Court': '4',
     'Page Circuit Court': '5',
     'Richmond City Circuit Court': '5',
     'Wise Circuit Court': '5'
