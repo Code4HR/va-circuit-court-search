@@ -35,24 +35,31 @@ python courts.py
 
 * Browse to `http://0.0.0.0:5000/`
 
-## Courts without normal case numbers
-AmherstCircuitCourt - case number doesn't reset every year
-BedfordCircuitCourt - case number doesn't reset every year
-BristolCircuitCourt - case number doesn't reset every year (resets at 9,999)
+## Courts that denote felony or misdemeanor in case number
 CharlotteCircuitCourt - case number has F/M after year (i.e. F00001)
 ChesterfieldCircuitCourt - case number has F/M after year (i.e. F00001)
-ClarkeCircuitCourt - case number doesn't reset every year
-CliftonForgeCircuitCourt - independent city until 2001, now part of Alleghany County
-FranklinCircuitCourt - case number doesn't reset every year, but there seem to be two different counters
 GoochlandCircuitCourt - case number has F/M before case number (i.e. 0000F1)
 LeeCircuitCourt - case number has F/M after year and one 0 (i.e. 0F0001)
-LoudounCircuitCourt - case number doesn't start with year (first filed in 2014 is CR00026174-00)
-MadisonCircuitCourt - case number doesn't reset every year
 PageCircuitCourt - case number has F/M after year (i.e. F00001)
-RadfordCircuitCourt - case number doesn't reset every year
 RichmondCityCircuitCourt - case number has F/M after year (i.e. F00001)
-RussellCircuitCourt - case number doesn't reset every year
-VirginiaBeachCircuitCourt - cases from 2014 on different website
-WilliamsburgJamesCityCountyCircuitCourt - case number doesn't reset every year
 WiseCircuitCourt - case number has F/M after year (i.e. F00001)
-YorkCountyPoquosonCircuitCourt - case number doesn't reset every year, cases commenced by reinstatement have different numbering 
+
+## Court with case numbers that don't reset each year
+AmherstCircuitCourt - (2014: 14890 - 15204)
+BedfordCircuitCourt - (2014: 11169 - 11554)
+BristolCircuitCourt - (2014: 1018 - 1483)
+ClarkeCircuitCourt - (2014: 7390 - 7675)
+FranklinCircuitCourt - (2014: 19481 - 19850, 56075 - 56757)
+LoudounCircuitCourt - (2014: 26174 - 27371) (CR00)
+MadisonCircuitCourt - 
+RadfordCircuitCourt - 
+RussellCircuitCourt - 
+WilliamsburgJamesCityCountyCircuitCourt - 
+YorkCountyPoquosonCircuitCourt -
+
+## Courts without normal case numbers
+AmherstCircuitCourt - cases commenced by reinstatement use original case number with letter (A, B, ...) after CRYY
+BristolCircuitCourt - probation violations have same case number with a V after CRYY
+CliftonForgeCircuitCourt - independent city until 2001, now part of Alleghany County
+VirginiaBeachCircuitCourt - cases from 2014 on different website
+YorkCountyPoquosonCircuitCourt - cases commenced by reinstatement have different numbering 
