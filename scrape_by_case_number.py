@@ -20,11 +20,44 @@ courts_with_fm_case_number = {
     'Wise Circuit Court': '5'
 }
 
+courts_with_continuing_case_numbers = {
+    'Amherst Circuit Court': [(14890, 15204)],
+    'Bedford Circuit Court': [(11169, 11554)],
+    'Bristol Circuit Court': [(1018, 1483)],
+    'Clarke Circuit Court': [(7390, 7675)],
+    'Franklin Circuit Court': [(19481, 19850), (56075, 56757)],
+    'Loudoun Circuit Court': [(26174, 27371)],
+    'Madison Circuit Court': [(5577, 5705)],
+    'Radford Circuit Court': [(12707, 13605)],
+    'Russell Circuit Court': [(2681, 2768), (15845, 15999), (16959, 17891)],
+    'Williamsburg James City County Circuit Court': [(23238, 24221)],
+    'York County Poquoson Circuit Court': [(8011, 8446)]
+}
+
+courts_without_year_in_prefix = [
+    'Loudoun Circuit Court'
+]
+
 def get_case_number(court, case_count, charge_count):
-    prefix = 'CR14'
-    case = format(case_count, '06')
-    charge = '-' + format(charge_count, '02')
     case_numbers = []
+    
+    prefix = 'CR14'
+    if court in courts_without_year_in_prefix:
+        prefix = 'CR00'
+    
+    case = format(case_count, '06')
+    if court in courts_with_continuing_case_numbers:
+        case = format(0, '06')
+        case_number_spans = courts_with_continuing_case_numbers[court]
+        for span in case_number_spans:
+            if case_count + span[0] <= span[1]:
+                case = format(case_count + span[0], '06')
+                break
+            else:
+                case_count -= span[1] - span[0] + 1
+    
+    charge = '-' + format(charge_count, '02')
+    
     if court in courts_with_fm_case_number:
         case_length = courts_with_fm_case_number[court]
         case = format(case_count, '0' + case_length)
@@ -34,6 +67,7 @@ def get_case_number(court, case_count, charge_count):
         case_numbers.append(prefix + case_m + charge)
     else:
         case_numbers.append(prefix + case + charge)
+    
     return case_numbers
 
 def getFilePath(court_name):
