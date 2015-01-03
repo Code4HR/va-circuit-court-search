@@ -77,8 +77,10 @@ def run():
         sequential_cases_missed_count = 0
         case_count = -1
         file_list = os.listdir(file_path)
-        if len(file_list) > 0:
-            case_count = int(file_list[-1][5:10]) - 1
+        for file_name in file_list:
+            cur_count = int(file_name[5:10])
+            if cur_count > case_count:
+                case_count = cur_count - 1
         
         search_next_case = True
         while search_next_case:
