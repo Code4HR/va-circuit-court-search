@@ -1,3 +1,4 @@
+import os
 import pymongo
 from bson.son import SON
 from pprint import pprint
@@ -55,7 +56,7 @@ def sentence():
     return db.criminal_cases.aggregate([
         {'$group':{
             '_id': {
-                'Jail/Penitentiary': '$Jail/Penitentiary'
+                'Commencedby': '$Commencedby'
             },
             'count': {'$sum': 1}
         }},
