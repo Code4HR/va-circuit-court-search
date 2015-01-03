@@ -91,9 +91,14 @@ def run():
             'name': option['value'][5:]
         })
     
+    courts_recently_completed = []
+    with open('courts_recently_completed.txt') as f:
+        courts_recently_completed = [x.strip('\n') for x in f.readlines()]
+    
     # Go to court
     for index, court in enumerate(courts):
-        if 'Russell' not in court['name']: continue
+        #if 'Russell' not in court['name']: continue
+        if court['name'] in courts_recently_completed: continue
         print court['name']
         file_path = getFilePath(court['name'])
         if not os.path.exists(file_path):
@@ -213,6 +218,9 @@ def run():
                         sequential_cases_missed_count += 1
                         if sequential_cases_missed_count > 9:
                             search_next_case = False
+        
+        with open('courts_recently_completed.txt', 'a') as f:
+            f.write(court['name'] + '\n')
 
 while True:
     try:
