@@ -51,11 +51,11 @@ BristolCircuitCourt - (2014: 1018 - 1483)
 ClarkeCircuitCourt - (2014: 7390 - 7675)
 FranklinCircuitCourt - (2014: 19481 - 19850, 56075 - 56757)
 LoudounCircuitCourt - (2014: 26174 - 27371) (CR00)
-MadisonCircuitCourt - 
-RadfordCircuitCourt - 
-RussellCircuitCourt - 
-WilliamsburgJamesCityCountyCircuitCourt - 
-YorkCountyPoquosonCircuitCourt -
+MadisonCircuitCourt - (2014: 5577 - 5705)
+RadfordCircuitCourt - (2014: 12707 - 13605)
+RussellCircuitCourt - (2014: 2681 - 2768, 15845 - 15999, 16959 - 17891)
+WilliamsburgJamesCityCountyCircuitCourt - (2014: 23238 - 24221)
+YorkCountyPoquosonCircuitCourt - (2014: 8011 - 8446)
 
 ## Courts without normal case numbers
 AmherstCircuitCourt - cases commenced by reinstatement use original case number with letter (A, B, ...) after CRYY
