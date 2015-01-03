@@ -36,23 +36,23 @@ python courts.py
 * Browse to `http://0.0.0.0:5000/`
 
 ## Courts without normal case numbers
-AmherstCircuitCourt - case number does't reset every year
-BedfordCircuitCourt - case number does't reset every year
-BristolCircuitCourt - case number does't reset every year (resets at 9,999)
+AmherstCircuitCourt - case number doesn't reset every year
+BedfordCircuitCourt - case number doesn't reset every year
+BristolCircuitCourt - case number doesn't reset every year (resets at 9,999)
 CharlotteCircuitCourt - case number has F/M after year (i.e. F00001)
 ChesterfieldCircuitCourt - case number has F/M after year (i.e. F00001)
-ClarkeCircuitCourt - case number does't reset every year
+ClarkeCircuitCourt - case number doesn't reset every year
 CliftonForgeCircuitCourt - independent city until 2001, now part of Alleghany County
-FranklinCircuitCourt - case number does't reset every year, but there seem to be two different counters
+FranklinCircuitCourt - case number doesn't reset every year, but there seem to be two different counters
 GoochlandCircuitCourt - case number has F/M before case number (i.e. 0000F1)
 LeeCircuitCourt - case number has F/M after year and one 0 (i.e. 0F0001)
-LoudounCircuitCourt - case number does not start with year (first filed in 2014 is CR00026174-00)
-MadisonCircuitCourt - case number does't reset every year
+LoudounCircuitCourt - case number doesn't start with year (first filed in 2014 is CR00026174-00)
+MadisonCircuitCourt - case number doesn't reset every year
 PageCircuitCourt - case number has F/M after year (i.e. F00001)
-RadfordCircuitCourt - case number does't reset every year
+RadfordCircuitCourt - case number doesn't reset every year
 RichmondCityCircuitCourt - case number has F/M after year (i.e. F00001)
-RussellCircuitCourt - case number does't reset every year
+RussellCircuitCourt - case number doesn't reset every year
 VirginiaBeachCircuitCourt - cases from 2014 on different website
-WilliamsburgJamesCityCountyCircuitCourt - case number does't reset every year
+WilliamsburgJamesCityCountyCircuitCourt - case number doesn't reset every year
 WiseCircuitCourt - case number has F/M after year (i.e. F00001)
-YorkCountyPoquosonCircuitCourt - case number does't reset every year, cases commenced by reinstatement have different numbering 
+YorkCountyPoquosonCircuitCourt - case number doesn't reset every year, cases commenced by reinstatement have different numbering 
