@@ -8,7 +8,8 @@ import pygal
 from bson.son import SON
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, request
+from pprint import pprint
 
 app = Flask(__name__)
 
@@ -209,6 +210,38 @@ def search(name):
 @app.route("/")
 def index():
     return render_template('index.html')
+
+@app.route("/stats")
+def stats():
+    return render_template('stats.html')
+
+@app.route("/stats/graph")
+def graph():
+    category = request.args.get('categories')
+    
+    client = pymongo.MongoClient(os.environ['MONGO_URI'])
+    db = client.va_circuit_court
+    data = db.criminal_cases.aggregate([
+        {'$group':{
+            '_id': {
+                category: '$' + category
+            },
+            'count': {'$sum': 1}
+        }},
+        {'$sort': SON([
+            ('count', -1)
+        ])},
+        {'$limit': 10}
+    ])['result']
+    
+    print pprint(data)
+    
+    bar_chart = pygal.Bar()
+    bar_chart.title = 'Cases in 2014'
+    bar_chart.x_labels = [str(x['_id'][category]) for x in data]
+    bar_chart.add(category, [x['count'] for x in data])
+    
+    return bar_chart.render()
 
 @app.route("/test")
 def test():
