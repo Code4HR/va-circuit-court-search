@@ -46,18 +46,46 @@
             <option value="Military">Military</option>
             <option value="TrafficFatality">Traffic Fatality</option>
         </select>
+        <select id="category-sort">
+            <option value="count">Count</option>
+            <option value="alpha">Alpha</option>
+        </select>
+        <select id="category-sort-direction">
+            <option value="-1">Down</option>
+            <option value="1">Up</option>
+        </select>
         <div id="category-graph"></div>
         
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script>
             function createCategoryGraph() {
-                var graphUrl = '/stats/graph?categories=' + $('#category').val();
-                $.get(graphUrl, function(data){
+                var categories = {'categories': [
+                    {
+                        'category': $('#category').val(),
+                        'sort': $('#category-sort').val(), 
+                        'sortDirection': $('#category-sort-direction').val()
+                    },
+                    {'category': 'Sex', 'sort': 'count'}
+                ]};
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/stats/graph',
+                    data: JSON.stringify(categories)
+                }).done(function(data){
                     $("#category-graph").html(data);
                 });
             }
             
             $('#category').change(function(){
+                createCategoryGraph();
+            });
+            
+            $('#category-sort').change(function(){
+                createCategoryGraph();
+            });
+            
+            $('#category-sort-direction').change(function(){
                 createCategoryGraph();
             });
             

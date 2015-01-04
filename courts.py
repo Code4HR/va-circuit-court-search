@@ -216,9 +216,17 @@ def index():
 def stats():
     return render_template('stats.html')
 
-@app.route("/stats/graph")
+@app.route("/stats/graph", methods=['POST'])
 def graph():
-    category = request.args.get('categories')
+    categories = request.get_json(force=True)['categories']
+    print categories
+    
+    category = categories[0]['category']
+    sort_by = categories[0]['sort']
+    if sort_by == 'alpha':
+        sort_by = '_id.' + category
+    sort_direction = int(categories[0]['sortDirection'])
+    sort = (sort_by, sort_direction)
     
     client = pymongo.MongoClient(os.environ['MONGO_URI'])
     db = client.va_circuit_court
@@ -230,7 +238,7 @@ def graph():
             'count': {'$sum': 1}
         }},
         {'$sort': SON([
-            ('count', -1)
+            sort
         ])},
         {'$limit': 20}
     ])['result']
