@@ -97,16 +97,11 @@ def run():
     
     # Go to court
     for index, court in enumerate(courts):
-        #if 'Russell' not in court['name']: continue
         if court['name'] in courts_recently_completed: continue
         print court['name']
         file_path = getFilePath(court['name'])
         if not os.path.exists(file_path):
             os.makedirs(file_path)
-        #elif len(courts) > index + 1:
-        #    next_file_path = getFilePath(courts[index+1]['name'])
-        #    if os.path.exists(next_file_path):
-        #        continue
         
         data = urllib.urlencode({
             'courtId': court['id'],
