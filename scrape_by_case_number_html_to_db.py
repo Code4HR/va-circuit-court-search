@@ -170,13 +170,13 @@ locality_directories = os.walk(base_path).next()[1]
 for directory in locality_directories:
     if last_locality == directory:
         skip_directory = False
-    #if skip_directory: continue
+    if skip_directory: continue
     
     filenames = os.listdir(base_path + directory)
     for filename in filenames:
         if last_case_number in filename:
             skip_case = False
-        #if skip_case: continue
+        if skip_case: continue
         
         cur_path = base_path + directory + '/' + filename
         with open(cur_path, 'r') as f:
