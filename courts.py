@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from flask import Flask, session, render_template, request
 from pprint import pprint
+from pygal.style import LightStyle
 
 app = Flask(__name__)
 
@@ -231,62 +232,17 @@ def graph():
         {'$sort': SON([
             ('count', -1)
         ])},
-        {'$limit': 10}
+        {'$limit': 20}
     ])['result']
     
     print pprint(data)
     
-    bar_chart = pygal.Bar()
-    bar_chart.title = 'Cases in 2014'
+    bar_chart = pygal.Bar(height=500, style=LightStyle, x_label_rotation=70)
+    bar_chart.title = 'VA Circuit Court Cases in 2014'
     bar_chart.x_labels = [str(x['_id'][category]) for x in data]
     bar_chart.add(category, [x['count'] for x in data])
     
     return bar_chart.render()
-
-@app.route("/test")
-def test():
-    client = pymongo.MongoClient(os.environ['MONGO_URI'])
-    db = client.va_circuit_court
-    courts = db.criminal_cases.aggregate([
-        {'$group':{
-            '_id': {
-                'Court': '$Court', 
-                'year': {'$year': '$OffenseDate'},
-                'month': {'$month': '$OffenseDate'}
-            },
-            'count': {'$sum': 1}
-        }},
-        {'$match' : { '_id.year' : 2014 } },
-        {'$sort': SON([
-            ('_id.Court', 1),
-            ('_id.year', 1),
-            ('_id.month', 1)
-        ])},
-        {'$group':{
-            '_id': {
-                'Court': '$_id.Court'
-            },
-            'data': {'$push': {
-                'month': '$_id.month',
-                'year': '$_id.year',
-                'count': '$count'
-            }}
-        }},
-        {'$sort': SON([
-            ('_id.Court', 1)
-        ])}
-    ])['result']
-    
-    result = ''
-    for court in courts:
-        vals = []
-        for val in court['data']:
-            vals.append(val['count'])
-        chart = pygal.Line()
-        chart.add('', vals)
-        result += str(court['_id']['Court']) + chart.render_sparkline() + '<br/>'
-    
-    return result
 
 if __name__ == "__main__":
     # Bind to PORT if defined, otherwise default to 5000.
