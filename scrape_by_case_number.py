@@ -30,8 +30,8 @@ courts_with_continuing_case_numbers = {
     'Madison Circuit Court': [(5577, 5705)],
     'Radford Circuit Court': [(12707, 13605)],
     'Russell Circuit Court': [(2681, 2768), (15845, 15999), (16959, 17891)],
-    'Williamsburg James City County Circuit Court': [(23238, 24221)],
-    'York County Poquoson Circuit Court': [(8011, 8446)]
+    'Williamsburg/James City County Circuit Court': [(23238, 24221)],
+    'York County/Poquoson Circuit Court': [(8011, 8446)]
 }
 
 courts_without_year_in_prefix = [
