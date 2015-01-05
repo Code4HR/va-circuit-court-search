@@ -1,0 +1,25 @@
+<div id="{{ category }}-filter" class="filter-container">
+    <div class="show-filter">
+        <a href="javascript:void(0);">Filter {{ category }}</a>
+    </div>
+    <div class="filters" style="display:inline-block; margin-left:10px;">
+        <div class="filter-all">
+            <a href="javascript:void(0);">All</a>
+        </div>
+        <div class="filter-none">
+            <a href="javascript:void(0);">None</a>
+        </div>
+        <div class="apply-filter">
+            <a href="javascript:void(0);">Apply</a>
+        </div>
+        <div style="max-height:150px; overflow-y:scroll;">
+            {% for value in filter_values %}
+                {% if value in filters_unchecked %}
+                    <input type="checkbox" value="{{ value }}"> {{ value }}<br>
+                {% else %}
+                    <input type="checkbox" value="{{ value }}" checked> {{ value }}<br>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

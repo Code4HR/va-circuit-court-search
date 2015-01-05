@@ -227,6 +227,7 @@ def graph():
         sort_by = '_id.' + category
     sort_direction = int(categories[0]['sortDirection'])
     sort = (sort_by, sort_direction)
+    filters = categories[0]['filter']
     
     client = pymongo.MongoClient(os.environ['MONGO_URI'])
     db = client.va_circuit_court
@@ -239,18 +240,23 @@ def graph():
         }},
         {'$sort': SON([
             sort
-        ])},
-        {'$limit': 20}
+        ])}
     ])['result']
     
     print pprint(data)
     
-    bar_chart = pygal.Bar(height=500, style=LightStyle, x_label_rotation=70)
-    bar_chart.title = 'VA Circuit Court Cases in 2014'
-    bar_chart.x_labels = [str(x['_id'][category]) for x in data]
-    bar_chart.add(category, [x['count'] for x in data])
+    values = [str(x['_id'][category]) for x in data]
     
-    return bar_chart.render()
+    bar_chart = pygal.Bar(height=450, style=LightStyle, x_label_rotation=70)
+    bar_chart.title = 'VA Circuit Court Cases in 2014'
+    bar_chart.x_labels = [v for v in values if v not in filters][:20]
+    bar_chart.add(category, [x['count'] for x in data if str(x['_id'][category]) not in filters][:20])
+    
+    return str(render_template('stats_filters.html', 
+        category=category, 
+        filter_values=sorted(values),
+        filters_unchecked=filters)) + \
+        bar_chart.render()
 
 if __name__ == "__main__":
     # Bind to PORT if defined, otherwise default to 5000.
