@@ -12,48 +12,88 @@
         </style>
     </head>
     <body>
-        <select id="category">
-            <option value="Court">Court</option>
-            <option value="Commencedby">Commenced by</option>
-            <option value="Sex">Sex</option>
-            <option value="Race">Race</option>
-            <option value="Address">Address</option>
-            <option value="Charge">Charge</option>
-            <option value="ChargeType">Charge Type</option>
-            <option value="DispositionCode">Disposition Code</option>
-            <option value="ConcludedBy">Concluded By</option>
-            <option value="AmendedCharge">Amended Charge</option>
-            <option value="AmendedChargeType">Amended Charge Type</option>
-            <option value="Jail/Penitentiary">Jail/Penitentiary</option>
-            <option value="Concurrent/Consecutive">Concurrent/Consecutive</option>
-            <option value="Life/Death">Life/Death</option>
-            <option value="SentenceTime">Sentence Time</option>
-            <option value="SentenceSuspended">Sentence Suspended</option>
-            <option value="OperatorLicenseSuspensionTime">Operator License Suspension Time</option>
-            <option value="FineAmount">Fine Amount</option>
-            <option value="Costs">Costs</option>
-            <option value="Fines/CostPaid">Fines/Cost Paid</option>
-            <option value="ProgramType">Program Type</option>
-            <option value="ProbationType">Probation Type</option>
-            <option value="ProbationTime">Probation Time</option>
-            <option value="ProbationStarts">Probation Starts</option>
-            <option value="Court/DMVSurrender">Court/DMV Surrender</option>
-            <option value="DriverImprovementClinic">Driver Improvement Clinic</option>
-            <option value="DrivingRestrictions">Driving Restrictions</option>
-            <option value="VAAlcoholSafetyAction">VA Alcohol Safety Action</option>
-            <option value="RestitutionPaid">Restitution Paid</option>
-            <option value="RestitutionAmount">Restitution Amount</option>
-            <option value="Military">Military</option>
-            <option value="TrafficFatality">Traffic Fatality</option>
-        </select>
-        <select id="category-sort">
-            <option value="count">Count</option>
-            <option value="alpha">Alpha</option>
-        </select>
-        <select id="category-sort-direction">
-            <option value="-1">Down</option>
-            <option value="1">Up</option>
-        </select>
+        <div>
+            <span>Category: </span>
+            <select id="category">
+                <option value="Court">Court</option>
+                <option value="Commencedby">Commenced by</option>
+                <option value="Sex">Sex</option>
+                <option value="Race">Race</option>
+                <option value="Address">Address</option>
+                <option value="Charge">Charge</option>
+                <option value="ChargeType">Charge Type</option>
+                <option value="DispositionCode">Disposition Code</option>
+                <option value="ConcludedBy">Concluded By</option>
+                <option value="AmendedCharge">Amended Charge</option>
+                <option value="AmendedChargeType">Amended Charge Type</option>
+                <option value="Jail/Penitentiary">Jail/Penitentiary</option>
+                <option value="Concurrent/Consecutive">Concurrent/Consecutive</option>
+                <option value="Life/Death">Life/Death</option>
+                <option value="SentenceTime">Sentence Time</option>
+                <option value="SentenceSuspended">Sentence Suspended</option>
+                <option value="OperatorLicenseSuspensionTime">Operator License Suspension Time</option>
+                <option value="FineAmount">Fine Amount</option>
+                <option value="Costs">Costs</option>
+                <option value="Fines/CostPaid">Fines/Cost Paid</option>
+                <option value="ProgramType">Program Type</option>
+                <option value="ProbationType">Probation Type</option>
+                <option value="ProbationTime">Probation Time</option>
+                <option value="ProbationStarts">Probation Starts</option>
+                <option value="Court/DMVSurrender">Court/DMV Surrender</option>
+                <option value="DriverImprovementClinic">Driver Improvement Clinic</option>
+                <option value="DrivingRestrictions">Driving Restrictions</option>
+                <option value="VAAlcoholSafetyAction">VA Alcohol Safety Action</option>
+                <option value="RestitutionPaid">Restitution Paid</option>
+                <option value="RestitutionAmount">Restitution Amount</option>
+                <option value="Military">Military</option>
+                <option value="TrafficFatality">Traffic Fatality</option>
+            </select>
+            <select id="category-sort">
+                <option value="count">Count</option>
+                <option value="alpha">Alpha</option>
+            </select>
+            <select id="category-sort-direction">
+                <option value="-1">Down</option>
+                <option value="1">Up</option>
+            </select>
+        </div>
+        <div>
+            <span>Sub-Category: </span>
+            <select id="sub-category">
+                <option value=""></option>
+                <option value="Commencedby">Commenced by</option>
+                <option value="Sex">Sex</option>
+                <option value="Race">Race</option>
+                <option value="Address">Address</option>
+                <option value="Charge">Charge</option>
+                <option value="ChargeType">Charge Type</option>
+                <option value="DispositionCode">Disposition Code</option>
+                <option value="ConcludedBy">Concluded By</option>
+                <option value="AmendedCharge">Amended Charge</option>
+                <option value="AmendedChargeType">Amended Charge Type</option>
+                <option value="Jail/Penitentiary">Jail/Penitentiary</option>
+                <option value="Concurrent/Consecutive">Concurrent/Consecutive</option>
+                <option value="Life/Death">Life/Death</option>
+                <option value="SentenceTime">Sentence Time</option>
+                <option value="SentenceSuspended">Sentence Suspended</option>
+                <option value="OperatorLicenseSuspensionTime">Operator License Suspension Time</option>
+                <option value="FineAmount">Fine Amount</option>
+                <option value="Costs">Costs</option>
+                <option value="Fines/CostPaid">Fines/Cost Paid</option>
+                <option value="ProgramType">Program Type</option>
+                <option value="ProbationType">Probation Type</option>
+                <option value="ProbationTime">Probation Time</option>
+                <option value="ProbationStarts">Probation Starts</option>
+                <option value="Court/DMVSurrender">Court/DMV Surrender</option>
+                <option value="DriverImprovementClinic">Driver Improvement Clinic</option>
+                <option value="DrivingRestrictions">Driving Restrictions</option>
+                <option value="VAAlcoholSafetyAction">VA Alcohol Safety Action</option>
+                <option value="RestitutionPaid">Restitution Paid</option>
+                <option value="RestitutionAmount">Restitution Amount</option>
+                <option value="Military">Military</option>
+                <option value="TrafficFatality">Traffic Fatality</option>
+            </select>
+        </div>
         <div id="category-graph"></div>
         
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -65,14 +105,21 @@
                         filters.push($(this).val());
                 });
                 
+                var category = $('#category').val();
+                var subCategory = $('#sub-category').val();
+                if(category === subCategory) {
+                    subCategory = '';
+                }
+                
                 var categories = {'categories': [
                     {
-                        'category': $('#category').val(),
+                        'category': category,
                         'sort': $('#category-sort').val(), 
                         'sortDirection': $('#category-sort-direction').val(),
                         'filter': filters
-                    },
-                    {'category': 'Sex', 'sort': 'count'}
+                    }, {
+                        'category': subCategory
+                    }
                 ]};
                 
                 $.ajax({
@@ -111,6 +158,10 @@
             });
             
             $('#category-sort-direction').change(function(){
+                createCategoryGraph();
+            });
+            
+            $('#sub-category').change(function(){
                 createCategoryGraph();
             });
             

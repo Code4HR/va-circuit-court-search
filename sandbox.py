@@ -56,12 +56,23 @@ def sentence():
     return db.criminal_cases.aggregate([
         {'$group':{
             '_id': {
-                'Commencedby': '$Commencedby'
+                'Court': '$Court',
+                'Sex': '$Sex'
             },
             'count': {'$sum': 1}
         }},
+        {'$group':{
+            '_id': {
+                'Court': '$_id.Court'
+            },
+            'data': {'$push': {
+                'Sex': '$_id.Sex',
+                'count': '$count'
+            }},
+            'count': {'$sum': '$count'}
+        }},
         {'$sort': SON([
-            ('count', -1)
+            ('_id.Court', 1)
         ])}
     ])
 

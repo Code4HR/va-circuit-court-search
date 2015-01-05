@@ -222,6 +222,7 @@ def graph():
     print categories
     
     category = categories[0]['category']
+    sub_category = categories[1]['category']
     sort_by = categories[0]['sort']
     if sort_by == 'alpha':
         sort_by = '_id.' + category
@@ -229,28 +230,75 @@ def graph():
     sort = (sort_by, sort_direction)
     filters = categories[0]['filter']
     
+    first_group_stage = {'$group':{
+        '_id': {
+            category: '$' + category
+        },
+        'count': {'$sum': 1}
+    }}
+    second_group_stage = None
+    if sub_category != '':
+        first_group_stage['$group']['_id'][sub_category] = '$' + sub_category
+        second_group_stage =  {'$group':{
+            '_id': {
+                category: '$_id.' + category,
+            },
+            'data': {'$push': {
+                sub_category: '$_id.' + sub_category,
+                'count': '$count'
+            }},
+            'count': {'$sum': '$count'}
+        }}
+    sort_stage = {'$sort': SON([
+        sort
+    ])}
+    
     client = pymongo.MongoClient(os.environ['MONGO_URI'])
     db = client.va_circuit_court
-    data = db.criminal_cases.aggregate([
-        {'$group':{
-            '_id': {
-                category: '$' + category
-            },
-            'count': {'$sum': 1}
-        }},
-        {'$sort': SON([
-            sort
-        ])}
-    ])['result']
+    data = None
+    if second_group_stage is None:
+        data = db.criminal_cases.aggregate([
+            first_group_stage,
+            sort_stage
+        ])['result']
+    else:
+        data = db.criminal_cases.aggregate([
+            first_group_stage,
+            second_group_stage,
+            sort_stage
+        ])['result']
     
+    sub_category_names = []
+    if sub_category != '':
+        for group in data:
+            for sub_category_group in group['data']:
+                sub_category_name = 'None'
+                if sub_category in sub_category_group:
+                    sub_category_name = sub_category_group[sub_category]
+                if sub_category_name not in sub_category_names:
+                    sub_category_names.append(sub_category_name)
+                group[sub_category_name] = sub_category_group['count']
     print pprint(data)
     
+    pprint(sub_category_names)
     values = [str(x['_id'][category]) for x in data]
+    labels = [v for v in values if v not in filters][:20]
     
     bar_chart = pygal.Bar(height=450, style=LightStyle, x_label_rotation=70)
     bar_chart.title = 'VA Circuit Court Cases in 2014'
-    bar_chart.x_labels = [v for v in values if v not in filters][:20]
-    bar_chart.add(category, [x['count'] for x in data if str(x['_id'][category]) not in filters][:20])
+    bar_chart.x_labels = labels
+    if sub_category == '':
+        bar_chart.add(category, [x['count'] for x in data if str(x['_id'][category]) not in filters][:20])
+    else:
+        for item in sub_category_names[:10]:
+            item_counts = []
+            for x in data:
+                if str(x['_id'][category]) in filters: continue
+                if item in x:
+                    item_counts.append(x[item])
+                else:
+                    item_counts.append(0)
+            bar_chart.add(item, item_counts[:20])
     
     return str(render_template('stats_filters.html', 
         category=category, 
