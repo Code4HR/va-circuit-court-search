@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Charges</title>
+
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <style>
+            .row { 
+                padding: 5px;
+            }
+    
+            .row:nth-child(even) {
+                background: #eee;
+            }
+    
+            .navbar { 
+                border-radius: 0px;
+            }
+
+            .footer {
+                margin-top: 50px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-6">
+                    <div>Code Section</div>
+                    <div class="text-muted">Sample Charge</div>
+                    <div>Total Counts (Avg Months Sentenced / Avg Months Suspended)</div>
+                    <div>Pct Amended (Avg Months Sentenced / Avg Months Suspended)(Where Charge was Amended)</div>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <div>Race - Pct Total Counts% (Avg Months Sentenced / Avg Months Suspended) Pct Amended</div>
+                </div>
+            </div>
+        {% for charge in charges %}
+            <div class="row">
+                <div class="col-xs-6">
+                    <div>{{ charge._id.CodeSection }}</div>
+                    <div class="text-muted">{{ charge.charge }}</div>
+                    <div>{{ charge.count }} Counts ({{ (charge.avgSentence/30)|int }}/{{ (charge.avgSentenceSuspended/30)|int }})</div>
+                    {% set pct_amended = (charge.amended.count / charge.count * 100)|int %}
+                    <div>{{ pct_amended }}% Amended ({{ (charge.amended.avgSentence/30)|int }}/{{ (charge.amended.avgSentenceSuspended/30)|int }})</div>
+                </div>
+                <div class="col-xs-6 text-right">
+                    {% set white = charge.races_dict['White Caucasian (Non-Hispanic)'] %}
+                    {% set white_count_pct = (white.count / charge.count * 100)|int if charge.count > 0 %}
+                    {% set white_avg_sent = (white.avgSentence/30)|int %}
+                    {% set white_svg_sent_susp = (white.avgSentenceSuspended/30)|int %}
+                    
+                    {% set white_amended = charge.amended.races_dict['White Caucasian (Non-Hispanic)'] %}
+                    {% set white_amended_pct = (white_amended.count/white.count*100)|int if white.count > 0 %}
+                    
+                    {% set black = charge.races_dict['Black (Non-Hispanic)'] %}
+                    {% set black_count_pct = (black.count / charge.count * 100)|int if charge.count > 0 %}
+                    {% set black_avg_sent = (black.avgSentence/30)|int %}
+                    {% set black_svg_sent_susp = (black.avgSentenceSuspended/30)|int %}
+                    
+                    {% set black_amended = charge.amended.races_dict['Black (Non-Hispanic)'] %}
+                    {% set black_amended_pct = (black_amended.count/black.count*100)|int if black.count > 0 %}
+                    
+                    <div>White - {{ white_count_pct }}% ({{ white_avg_sent }}/{{ white_svg_sent_susp }}) {{white_amended_pct}}% Amended</div>
+                    <div>Black - {{ black_count_pct }}% ({{ black_avg_sent }}/{{ black_svg_sent_susp }}) {{black_amended_pct}}% Amended</div>
+                </div>
+            </div>
+        {% endfor %}
+    </body>
+</html>

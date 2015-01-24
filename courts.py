@@ -212,6 +212,128 @@ def search(name):
 def index():
     return render_template('index.html')
 
+@app.route("/charges")
+def charges():
+    client = pymongo.MongoClient(os.environ['MONGO_URI'])
+    db = client.va_circuit_court
+    charges = db.criminal_cases.aggregate([
+        {'$group':{
+            '_id': {
+                'CodeSection': '$CodeSection',
+                'Race': '$Race'
+            },
+            'charge': {'$first': '$Charge'},
+            'court': {'$first': '$Court'},
+            'caseNumber': {'$first': '$CaseNumber'},
+            'avgSentence': {'$avg': '$SentenceTimeDays'},
+            'avgSentenceSuspended': {'$avg': '$SentenceSuspendedDays'},
+            'count': {'$sum': 1}
+        }},
+        {'$group':{
+            '_id': {
+                'CodeSection': '$_id.CodeSection'
+            },
+            'races': {'$push': {
+                'race': '$_id.Race',
+                'avgSentence': '$avgSentence',
+                'avgSentenceSuspended': '$avgSentenceSuspended',
+                'count': '$count'
+            }},
+            'count': {'$sum': '$count'},
+            'avgSentence': {'$avg': '$avgSentence'},
+            'avgSentenceSuspended': {'$avg': '$avgSentenceSuspended'},
+            'charge': {'$first': '$charge'},
+            'court': {'$first': '$court'},
+            'caseNumber': {'$first': '$caseNumber'}
+        }},
+        {'$match' : { 
+            'count' : {'$gt' : 50}
+        }},
+        {'$sort': SON([
+            ('_id.CodeSection', 1)
+        ])}
+    ])['result']
+    
+    charges_amended = db.criminal_cases.aggregate([
+        {'$match': {'AmendedCharge': {'$ne': None}}},
+        {'$group':{
+            '_id': {
+                'CodeSection': '$CodeSection',
+                'Race': '$Race'
+            },
+            'charge': {'$first': '$Charge'},
+            'court': {'$first': '$Court'},
+            'caseNumber': {'$first': '$CaseNumber'},
+            'avgSentence': {'$avg': '$SentenceTimeDays'},
+            'avgSentenceSuspended': {'$avg': '$SentenceSuspendedDays'},
+            'count': {'$sum': 1}
+        }},
+        {'$group':{
+            '_id': {
+                'CodeSection': '$_id.CodeSection'
+            },
+            'races': {'$push': {
+                'race': '$_id.Race',
+                'avgSentence': '$avgSentence',
+                'avgSentenceSuspended': '$avgSentenceSuspended',
+                'count': '$count'
+            }},
+            'count': {'$sum': '$count'},
+            'avgSentence': {'$avg': '$avgSentence'},
+            'avgSentenceSuspended': {'$avg': '$avgSentenceSuspended'},
+            'charge': {'$first': '$charge'},
+            'court': {'$first': '$court'},
+            'caseNumber': {'$first': '$caseNumber'}
+        }},
+        {'$sort': SON([
+            ('_id.CodeSection', 1)
+        ])}
+    ])['result']
+    
+    for charge in charges:
+        charge['amended'] = {
+            'count': 0,
+            'avgSentence': 0,
+            'avgSentenceSuspended': 0,
+            'races': []
+        }
+        for charge_amended in charges_amended:
+            if charge_amended['_id']['CodeSection'] == charge['_id']['CodeSection']:
+                charge['amended'] = charge_amended
+                break
+        charge['races_dict'] = {
+            'White Caucasian (Non-Hispanic)': {
+                'count': 0, 
+                'avgSentence': 0, 
+                'avgSentenceSuspended': 0
+            },
+            'Black (Non-Hispanic)': {
+                'count': 0, 
+                'avgSentence': 0, 
+                'avgSentenceSuspended': 0
+            }
+        }
+        charge['amended']['races_dict'] = {
+            'White Caucasian (Non-Hispanic)': {
+                'count': 0, 
+                'avgSentence': 0, 
+                'avgSentenceSuspended': 0
+            },
+            'Black (Non-Hispanic)': {
+                'count': 0, 
+                'avgSentence': 0, 
+                'avgSentenceSuspended': 0
+            }
+        }
+        for race in charge['races']:
+            if 'race' in race:
+                charge['races_dict'][race['race']] = race
+        for race in charge['amended']['races']:
+            if 'race' in race:
+                charge['amended']['races_dict'][race['race']] = race
+    
+    return render_template('charges.html', charges=charges, charges_amended=charges_amended)
+
 @app.route("/stats")
 def stats():
     return render_template('stats.html')

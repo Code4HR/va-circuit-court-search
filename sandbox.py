@@ -52,28 +52,74 @@ def crime_type():
         {'$limit': 10}
     ])
 
-def sentence():
+def charges_by_race():
     return db.criminal_cases.aggregate([
         {'$group':{
             '_id': {
-                'Court': '$Court',
-                'Sex': '$Sex'
+                'CodeSection': '$CodeSection',
+                'Race': '$Race'
             },
+            'charge': {'$first': '$Charge'},
+            'avgSentenceTime': {'$avg': '$SentenceTimeDays'},
+            'maxSentenceTime': {'$max': '$SentenceTimeDays'},
+            'minSentenceTime': {'$min': '$SentenceTimeDays'},
+            'count': {'$sum': 1}
+        }},
+        {'$match' : { 
+            'count' : {'$gt' : 10},
+            'avgSentenceTime': {'$gt': 0.0}
+        }},
+        {'$sort': SON([
+            ('_id.CodeSection', 1)
+        ])}
+    ])
+    
+
+def sentence_time_overview():
+    return db.criminal_cases.aggregate([
+        {'$group':{
+            '_id': None,
+            'avgSentenceTime': {'$avg': '$SentenceTimeDays'},
+            'maxSentenceTime': {'$max': '$SentenceTimeDays'},
+            'totalSentenceTime': {'$sum': '$SentenceTimeDays'},
+            'avgSentenceSuspended': {'$avg': '$SentenceSuspendedDays'},
+            'maxSentenceSuspended': {'$max': '$SentenceSuspendedDays'},
+            'totalSentenceSuspended': {'$sum': '$SentenceSuspendedDays'},
+            'count': {'$sum': 1}
+        }},
+        {'$sort': SON([
+            ('avgSentenceSuspended', 1)
+        ])}
+    ])
+    
+def sandbox():
+    return db.criminal_cases.aggregate([
+        {'$group':{
+            '_id': {
+                'CodeSection': '$CodeSection',
+                'Race': '$Race'
+            },
+            'charge': {'$first': '$Charge'},
+            'avgSentence': {'$avg': '$SentenceTimeDays'},
+            'avgSentenceSuspended': {'$avg': '$SentenceSuspendedDays'},
             'count': {'$sum': 1}
         }},
         {'$group':{
             '_id': {
-                'Court': '$_id.Court'
+                'CodeSection': '$_id.CodeSection'
             },
-            'data': {'$push': {
-                'Sex': '$_id.Sex',
+            'races': {'$push': {
+                'race': '$_id.Race',
+                'avgSentence': '$avgSentence',
+                'avgSentenceSuspended': '$avgSentenceSuspended',
                 'count': '$count'
             }},
-            'count': {'$sum': '$count'}
+            'count': {'$sum': '$count'},
+            'charge': {'$first': '$charge'}
         }},
         {'$sort': SON([
-            ('_id.Court', 1)
+            ('count', 1)
         ])}
     ])
 
-pprint(sentence())
+pprint(len(sandbox()['result']))
