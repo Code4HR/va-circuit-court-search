@@ -3,6 +3,8 @@ import os
 import pymongo
 import re
 import sys
+import threading
+import time
 import urllib
 import urllib2
 from bs4 import BeautifulSoup
@@ -10,6 +12,24 @@ from time import sleep
 
 user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
     u"rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11"
+running = True
+
+class caseNumberThread(threading.Thread):
+    def __init__(self, court):
+        threading.Thread.__init__(self)
+        self.court = court
+    def run(self):
+        client = pymongo.MongoClient(os.environ['MONGO_URI'])
+        db = client.va_circuit_court_case_numbers
+        opener = get_opener()
+        get_list_of_courts(opener)
+        last_record = db.case_numbers.find_one({'court': self.court}, \
+                                sort=[('name', pymongo.DESCENDING)])
+        last_name = 'A'
+        if last_record is not None:
+            last_name = last_record['name']
+        print self.court, last_name
+        get_case_numbers(opener, db, self.court, last_name)
 
 def get_opener():
     # Get cookie and list of courts
@@ -67,7 +87,7 @@ def get_case_numbers(opener, db, court, name):
 
     #count = 1
     final_case_prev = None
-    while(final_case != final_case_prev):
+    while(final_case != final_case_prev and running):
         search_results = opener.open(search_url, data)
         html = search_results.read()
         final_case_prev = final_case
@@ -76,38 +96,48 @@ def get_case_numbers(opener, db, court, name):
 
 def get_cases(html, court, db):
     final_case = None
+    bulk = db.case_numbers.initialize_ordered_bulk_op()
     for row in html.find(class_="nameList").find_all('tr'):
         cols = row.find_all('td')
-        if len(cols) > 1:
+        if len(cols) > 4:
             case_number = cols[0].span.a.string.strip()
             name = cols[1].string.strip()
-            db.case_numbers.update({
+            charge = cols[2].string
+            date = cols[3].string
+            status = cols[4].string
+            if charge is not None: charge = charge.strip()
+            if date is not None: date = date.strip()
+            if status is not None: status = status.strip()
+            bulk.find({
                 'court': court,
                 'case_number': case_number
-            }, {
-                '$set': {
-                    'court': court,
-                    'case_number': case_number,
-                    'name': name,
-                    'charge': cols[2].string.strip(),
-                    'date': cols[3].string.strip(),
-                    'status': cols[4].string.strip()
-                }
-            }, upsert = True)
-            print case_number, name
+            }).upsert().replace_one({
+                'court': court,
+                'case_number': case_number,
+                'name': name,
+                'charge': charge,
+                'date': date,
+                'status': status
+            })
+            print case_number, name, court
             final_case = case_number
+    bulk.execute()
     return final_case
 
-client = pymongo.MongoClient(os.environ['MONGO_URI'])
-db = client.va_circuit_court_case_numbers
-opener = get_opener()
-courts = get_list_of_courts(opener)
+try:
+    opener = get_opener()
+    courts = get_list_of_courts(opener)
+    last_court_index = 0
+    while last_court_index < len(courts):
+        if threading.activeCount() < 5:
+            caseNumberThread(courts[last_court_index]['fullName']).start()
+            last_court_index += 1
+        time.sleep(3)
 
-for court in courts:
-    last_record = db.case_numbers.find_one({'court': court['fullName']}, \
-                        sort=[('name', pymongo.DESCENDING)])
-    last_name = 'A'
-    if last_record is not None:
-        last_name = last_record['name']
-    print court['fullName'], last_name
-    get_case_numbers(opener, db, court['fullName'], last_name)
+    while threading.activeCount() > 1:
+        time.sleep(3)
+    print 'Finished!'
+except (KeyboardInterrupt, SystemExit):
+    print 'Kill all threads'
+    running = False
+
