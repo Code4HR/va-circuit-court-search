@@ -96,30 +96,13 @@ def sandbox():
     return db.criminal_cases.aggregate([
         {'$group':{
             '_id': {
-                'CodeSection': '$CodeSection',
-                'Race': '$Race'
+                'Court': '$Court'
             },
-            'charge': {'$first': '$Charge'},
-            'avgSentence': {'$avg': '$SentenceTimeDays'},
-            'avgSentenceSuspended': {'$avg': '$SentenceSuspendedDays'},
             'count': {'$sum': 1}
         }},
-        {'$group':{
-            '_id': {
-                'CodeSection': '$_id.CodeSection'
-            },
-            'races': {'$push': {
-                'race': '$_id.Race',
-                'avgSentence': '$avgSentence',
-                'avgSentenceSuspended': '$avgSentenceSuspended',
-                'count': '$count'
-            }},
-            'count': {'$sum': '$count'},
-            'charge': {'$first': '$charge'}
-        }},
         {'$sort': SON([
-            ('count', 1)
+            ('_id.Court', 1)
         ])}
     ])
 
-pprint(len(sandbox()['result']))
+pprint(sandbox()['result'])

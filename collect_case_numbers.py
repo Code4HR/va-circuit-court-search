@@ -8,6 +8,7 @@ import time
 import urllib
 import urllib2
 from bs4 import BeautifulSoup
+from datetime import datetime
 from time import sleep
 
 user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
@@ -28,6 +29,8 @@ class caseNumberThread(threading.Thread):
         last_name = 'A'
         if last_record is not None:
             last_name = last_record['name']
+        if "FRANK'S" in last_name and 'Arlington' in self.court:
+            last_name = "FRANK'T"
         print self.court, last_name
         get_case_numbers(opener, db, self.court, last_name)
 
@@ -85,14 +88,18 @@ def get_case_numbers(opener, db, court, name):
         'searchType': '',
         'emptyList': ''})
 
-    #count = 1
     final_case_prev = None
     while(final_case != final_case_prev and running):
+        curHour = datetime.today().hour
+        if curHour > 8 or curHour < 18:
+            print 'Rate limit during working hours', datetime.today().time()
+            time.sleep(15)
+        print 'Request data', court, datetime.today().time()
         search_results = opener.open(search_url, data)
         html = search_results.read()
         final_case_prev = final_case
+        print 'Save data', court, datetime.today().time()
         final_case = get_cases(BeautifulSoup(html), court, db)
-        #count += 1
 
 def get_cases(html, court, db):
     final_case = None
@@ -129,7 +136,7 @@ try:
     courts = get_list_of_courts(opener)
     last_court_index = 0
     while last_court_index < len(courts):
-        if threading.activeCount() < 5:
+        if threading.activeCount() < 4:
             caseNumberThread(courts[last_court_index]['fullName']).start()
             last_court_index += 1
         time.sleep(3)
