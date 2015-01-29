@@ -1,0 +1,14 @@
+{% for court in data %}
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="pull-right">
+                <b>{{ court._id.court }}</b> {{ court.count }}
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="pull-left">
+                {{ court.firstName|truncate(5, True, "") }} - {{ court.lastName|truncate(5, True, "") }}
+            </div>
+        </div>
+    </div>
+{% endfor %}

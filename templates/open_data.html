@@ -8,7 +8,22 @@
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
         <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
         <style>
-
+            .navbar { 
+                border-radius: 0px;
+            }
+            
+            #detailed-progress .row { 
+                padding: 5px;
+            }
+    
+            #detailed-progress .row:nth-child(even) {
+                background: #eee;
+            }
+            
+            .footer {
+                margin-top: 50px;
+                margin-bottom: 20px;
+            }
         </style>
     </head>
     <body>
@@ -41,24 +56,52 @@
             </ul>
             
             <h3>Current Efforts</h3>
-            <p>We are attempting to open this data by scraping it from the court's website. You can check on our progress below. Journalists in Virginia have already begun to find trends in this data worth reporting, which demonstrates how powerful it can be. Unfortunately, this method is not ideal. It will take months to duplicate the database in this way and it will be extremely difficult to keep it updated.</p>
+            <p>We are attempting to open this data by scraping it from the court's website. You can check on our progress below. Journalists in Virginia have already begun to find trends in this data worth reporting, which demonstrates how powerful it can be. Unfortunately, this method is not ideal. It will take months to duplicate the database in this way and it will be extremely difficult to keep it updated. Even so, we will continue these efforts until the state provides us access to the data.</p>
             
             <h3>Progress</h3>
             <h4>2014 Criminal Cases</h4>
-            <p>We collected a large majority of criminal cases filed in 2014 by relying on the (mostly) sequential nature of the case numbers. That data is available as a bulk download or in a MongoDB. Alexandria, Fairfax, and Virginia Beach are not included in this data.</p>
+            <p>We collected a large majority of criminal cases filed in 2014 by relying on the (mostly) sequential nature of the case numbers. That data is available for bulk download in CSV format here. Alexandria, Fairfax, and Virginia Beach are not included in this data.</p>
             <ul>
-                <li><a href="https://www.dropbox.com/s/vs5n2nzfl8sobwe/va_criminal_cases_14.csv?dl=0">CSV File</a></li>
-                <li>MongoDB Shell<pre>mongo ds029801.mongolab.com:29801/va_circuit_court -u user1 -p virginia</pre></li>
-                <li>MongoDB URI<pre>mongodb://user1:virginia@ds029801.mongolab.com:29801/va_circuit_court</pre></li>
+                <li><a href="https://www.dropbox.com/s/vs5n2nzfl8sobwe/va_criminal_cases_14.csv?dl=0">110,649 Criminal Cases Filed in 2014 [CSV]</a> (41.96 MB)</li>
             </ul>
             
             <h4>Complete Criminal Case Database</h4>
-            <p>We are currently working to create a copy of the entire criminal case database. The first step is to collect all case numbers by going to the page for each court, searching for name "A", then clicking the "Next" button until we get to the end of the list. That effort is underway. Once that is finished, we will get details for each case.</p>
-            <h4 class="text-center">{{ data.case_number_count }} Case Numbers Collected</h4>
+            <p>We are currently working to create a copy of the entire criminal case database. The first step is to collect all case numbers by going to the site for each court, searching for name "A", then clicking the "Next" button until we get to the end of the list. That effort is underway. Once that is finished, we will get details for each case.</p>
+            <div class="text-center">
+                <h4>{{ data.case_number_count }} Case Numbers Collected</h4>
+                <div id="detailed-progress">
+                    <button class="btn btn-link" onclick="getDetailedProgress()">See Detailed Progress</button>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p class="pull-right">
+                    Built by <a href="http://codeforNRV.org">Code for New River Valley</a> | <a href="https://github.com/CodeforNRV/va-circuit-court-search"><i class="fa fa-github"></i> Pull requests welcome!</a>
+                </p>
+                <p>
+                    <a href="https://twitter.com/oilytheotter"><i class="fa fa-twitter"></i> @oilytheotter</a> | <a href="https://twitter.com/opengovva"><i class="fa fa-twitter"></i> @opengovva</a> 
+                </p>
+            </div>
         </div>
-        
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script>
+            function getDetailedProgress() {
+                $('#detailed-progress').html('Loading...');
+                $.get('/opendata/progress', function(data) {
+                    $('#detailed-progress').html(data);
+                })
+                .fail(function() {
+                    $('#detailed-progress').html('<div>Error</div>');
+                });
+            }
+            
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-56808528-1', 'auto');
+            ga('send', 'pageview');
         </script>
     </body>
 </html>
