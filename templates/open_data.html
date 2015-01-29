@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Opening Virginia's Circuit Court Data</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+        <style>
+
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">VA Circuit Court Statewide Search</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a href="/opendata">Help Open This Data</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="text-center">
+                <h2>Opening Virginia's Circuit Court Data</h2>
+                <h4>A project to open the Virginia Circuit Court's case management system</h4>
+            </div>
+            
+            <h3>Why Open This Data</h3>
+            <p>Virginia's Court System provides <a href="http://ewsocis1.courts.state.va.us/CJISWeb/circuit.jsp">public access to case information</a>, but it is severely limited by a narrow search of one court at time and access to one case at a time. As the <a href="https://data.virginia.gov/what-is-open-data/">Governor's Office suggests</a>, opening the case management system will promote greater transparency and accountability of Virginia's Judicial System as well as allowing the public to unlock the value of this data.</p>
+            
+            <h3>How You Can Help</h3>
+            <p>The best way to get this data is for the Office of the Executive Secretary to provide access to it. This will allow anyone to search and analyze all cases at once, as well as giving developers the ability to build tools that leverage the data in unique and powerful ways. Help us by contacting the Clerk of your Circuit Court and asking them to make their data available in a bulk download.</p>
+            <h5>Resources</h5>
+            <ul>
+                <li><a href="http://www.courts.state.va.us/courts/circuit.html">Find your Clerk's contact information</a></li>
+                <li><a href="/sampleLetter">Copy this sample request letter</a></li>
+            </ul>
+            
+            <h3>Current Efforts</h3>
+            <p>We are attempting to open this data by scraping it from the court's website. You can check on our progress below. Journalists in Virginia have already begun to find trends in this data worth reporting, which demonstrates how powerful it can be. Unfortunately, this method is not ideal. It will take months to duplicate the database in this way and it will be extremely difficult to keep it updated.</p>
+            
+            <h3>Progress</h3>
+            <h4>2014 Criminal Cases</h4>
+            <p>We collected a large majority of criminal cases filed in 2014 by relying on the (mostly) sequential nature of the case numbers. That data is available as a bulk download or in a MongoDB. Alexandria, Fairfax, and Virginia Beach are not included in this data.</p>
+            <ul>
+                <li><a href="https://www.dropbox.com/s/vs5n2nzfl8sobwe/va_criminal_cases_14.csv?dl=0">CSV File</a></li>
+                <li>MongoDB Shell<pre>mongo ds029801.mongolab.com:29801/va_circuit_court -u user1 -p virginia</pre></li>
+                <li>MongoDB URI<pre>mongodb://user1:virginia@ds029801.mongolab.com:29801/va_circuit_court</pre></li>
+            </ul>
+            
+            <h4>Complete Criminal Case Database</h4>
+            <p>We are currently working to create a copy of the entire criminal case database. The first step is to collect all case numbers by going to the page for each court, searching for name "A", then clicking the "Next" button until we get to the end of the list. That effort is underway. Once that is finished, we will get details for each case.</p>
+            <h4 class="text-center">{{ data.case_number_count }} Case Numbers Collected</h4>
+        </div>
+        
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script>
+        </script>
+    </body>
+</html>

@@ -5,6 +5,7 @@ import os
 import pickle
 import pymongo
 import pygal
+import locale
 from bson.son import SON
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -333,6 +334,21 @@ def charges():
                 charge['amended']['races_dict'][race['race']] = race
     
     return render_template('charges.html', charges=charges, charges_amended=charges_amended)
+    
+@app.route("/opendata")
+def open_data():
+    client = pymongo.MongoClient(os.environ['MONGO_CASES_URI'])
+    db = client.va_circuit_court_cases
+    locale.setlocale(locale.LC_ALL, 'en_US')
+    case_number_count = locale.format("%d", db.case_numbers.count(), grouping=True)
+    data = {
+        'case_number_count': case_number_count
+    }
+    return render_template('open_data.html', data=data)
+
+@app.route("/sampleLetter")
+def sample_letter():
+    return render_template('sample_letter.html')
 
 @app.route("/stats")
 def stats():

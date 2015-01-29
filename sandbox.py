@@ -4,7 +4,7 @@ from bson.son import SON
 from pprint import pprint
 
 client = pymongo.MongoClient(os.environ['MONGO_URI'])
-db = client.va_circuit_court_case_numbers
+db = client.va_circuit_court_cases
 
 
 def num_cases_per_month_by_court():
