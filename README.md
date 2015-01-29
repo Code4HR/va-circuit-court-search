@@ -36,30 +36,30 @@ python courts.py
 * Browse to `http://0.0.0.0:5000/`
 
 ## Courts that denote felony or misdemeanor in case number
-CharlotteCircuitCourt - case number has F/M after year (i.e. F00001)
-ChesterfieldCircuitCourt - case number has F/M after year (i.e. F00001)
-GoochlandCircuitCourt - case number has F/M before case number (i.e. 0000F1)
-LeeCircuitCourt - case number has F/M after year and one 0 (i.e. 0F0001)
-PageCircuitCourt - case number has F/M after year (i.e. F00001)
-RichmondCityCircuitCourt - case number has F/M after year (i.e. F00001)
-WiseCircuitCourt - case number has F/M after year (i.e. F00001)
+- CharlotteCircuitCourt - case number has F/M after year (i.e. F00001)
+- ChesterfieldCircuitCourt - case number has F/M after year (i.e. F00001)
+- GoochlandCircuitCourt - case number has F/M before case number (i.e. 0000F1)
+- LeeCircuitCourt - case number has F/M after year and one 0 (i.e. 0F0001)
+- PageCircuitCourt - case number has F/M after year (i.e. F00001)
+- RichmondCityCircuitCourt - case number has F/M after year (i.e. F00001)
+- WiseCircuitCourt - case number has F/M after year (i.e. F00001)
 
 ## Court with case numbers that don't reset each year
-AmherstCircuitCourt - (2014: 14890 - 15204)
-BedfordCircuitCourt - (2014: 11169 - 11554)
-BristolCircuitCourt - (2014: 1018 - 1483)
-ClarkeCircuitCourt - (2014: 7390 - 7675)
-FranklinCircuitCourt - (2014: 19481 - 19850, 56075 - 56757)
-LoudounCircuitCourt - (2014: 26174 - 27371) (CR00)
-MadisonCircuitCourt - (2014: 5577 - 5705)
-RadfordCircuitCourt - (2014: 12707 - 13605)
-RussellCircuitCourt - (2014: 2681 - 2768, 15845 - 15999, 16959 - 17891)
-WilliamsburgJamesCityCountyCircuitCourt - (2014: 23238 - 24221)
-YorkCountyPoquosonCircuitCourt - (2014: 8011 - 8446)
+- AmherstCircuitCourt - (2014: 14890 - 15204)
+- BedfordCircuitCourt - (2014: 11169 - 11554)
+- BristolCircuitCourt - (2014: 1018 - 1483)
+- ClarkeCircuitCourt - (2014: 7390 - 7675)
+- FranklinCircuitCourt - (2014: 19481 - 19850, 56075 - 56757)
+- LoudounCircuitCourt - (2014: 26174 - 27371) (CR00)
+- MadisonCircuitCourt - (2014: 5577 - 5705)
+- RadfordCircuitCourt - (2014: 12707 - 13605)
+- RussellCircuitCourt - (2014: 2681 - 2768, 15845 - 15999, 16959 - 17891)
+- WilliamsburgJamesCityCountyCircuitCourt - (2014: 23238 - 24221)
+- YorkCountyPoquosonCircuitCourt - (2014: 8011 - 8446)
 
 ## Courts without normal case numbers
-AmherstCircuitCourt - cases commenced by reinstatement use original case number with letter (A, B, ...) after CRYY
-BristolCircuitCourt - probation violations have same case number with a V after CRYY
-CliftonForgeCircuitCourt - independent city until 2001, now part of Alleghany County
-VirginiaBeachCircuitCourt - cases from 2014 on different website
-YorkCountyPoquosonCircuitCourt - cases commenced by reinstatement have different numbering 
+- AmherstCircuitCourt - cases commenced by reinstatement use original case number with letter (A, B, ...) after CRYY
+- BristolCircuitCourt - probation violations have same case number with a V after CRYY
+- CliftonForgeCircuitCourt - independent city until 2001, now part of Alleghany County
+- VirginiaBeachCircuitCourt - cases from 2014 on different website
+- YorkCountyPoquosonCircuitCourt - cases commenced by reinstatement have different numbering 
