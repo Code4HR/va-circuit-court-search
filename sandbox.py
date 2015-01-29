@@ -4,7 +4,7 @@ from bson.son import SON
 from pprint import pprint
 
 client = pymongo.MongoClient(os.environ['MONGO_URI'])
-db = client.va_circuit_court
+db = client.va_circuit_court_case_numbers
 
 
 def num_cases_per_month_by_court():
@@ -93,15 +93,21 @@ def sentence_time_overview():
     ])
     
 def sandbox():
-    return db.criminal_cases.aggregate([
+    return db.case_numbers.aggregate([
+        {'$sort': SON([
+            ('court', 1),
+            ('name', 1)
+        ])},
         {'$group':{
             '_id': {
-                'Court': '$Court'
+                'court': '$court'
             },
+            'firstName': {'$first': '$name'},
+            'lastName': {'$last': '$name'},
             'count': {'$sum': 1}
         }},
         {'$sort': SON([
-            ('_id.Court', 1)
+            ('_id.court', 1)
         ])}
     ])
 
