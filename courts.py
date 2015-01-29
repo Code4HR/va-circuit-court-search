@@ -338,7 +338,7 @@ def charges():
 def open_data():
     client = pymongo.MongoClient(os.environ['MONGO_CASES_URI'])
     db = client.va_circuit_court_cases
-    locale.setlocale(locale.LC_ALL, 'en_US')
+    locale.resetlocale()
     case_number_count = locale.format("%d", db.case_numbers.count(), grouping=True)
     data = {
         'case_number_count': case_number_count
