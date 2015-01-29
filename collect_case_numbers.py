@@ -19,20 +19,21 @@ class caseNumberThread(threading.Thread):
     def __init__(self, court):
         threading.Thread.__init__(self)
         self.court = court
+        self.courtName = court[5:].replace(' Circuit Court', '')
     def run(self):
         client = pymongo.MongoClient(os.environ['MONGO_URI'])
         db = client.va_circuit_court_case_numbers
         opener = get_opener()
         get_list_of_courts(opener)
-        last_record = db.case_numbers.find_one({'court': self.court}, \
+        last_record = db.case_numbers.find_one({'court': self.courtName}, \
                                 sort=[('name', pymongo.DESCENDING)])
         last_name = 'A'
         if last_record is not None:
             last_name = last_record['name']
-        if "FRANK'S" in last_name and 'Arlington' in self.court:
+        if "FRANK'S" in last_name and 'Arlington' in self.courtName:
             last_name = "FRANK'T"
-        print self.court, last_name
-        get_case_numbers(opener, db, self.court, last_name)
+        print self.courtName, last_name
+        get_case_numbers(opener, db, self.court, self.courtName, last_name)
 
 def get_opener():
     # Get cookie and list of courts
@@ -53,9 +54,8 @@ def get_list_of_courts(opener):
         })
     return courts
 
-def get_case_numbers(opener, db, court, name):
+def get_case_numbers(opener, db, court, courtName, name):
     courtId = court[:3]
-    courtName = court[5:].replace(' Circuit Court', '')
     data = urllib.urlencode({
         'courtId': courtId,
         'courtType': 'C',
