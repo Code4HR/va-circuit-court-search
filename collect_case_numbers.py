@@ -9,6 +9,8 @@ import urllib
 import urllib2
 from bs4 import BeautifulSoup
 from datetime import datetime
+from pprint import pprint
+from pymongo.errors import BulkWriteError
 from time import sleep
 
 user_agent = u"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; " + \
@@ -22,7 +24,7 @@ class caseNumberThread(threading.Thread):
         self.courtName = court[5:].replace(' Circuit Court', '')
     def run(self):
         client = pymongo.MongoClient(os.environ['MONGO_URI'])
-        db = client.va_circuit_court_case_numbers
+        db = client.va_circuit_court_cases
         opener = get_opener()
         get_list_of_courts(opener)
         last_record = db.case_numbers.find_one({'court': self.courtName}, \
@@ -131,7 +133,11 @@ def get_cases(html, court, db):
             })
             print case_number, name, court
             final_case = case_number
-    bulk.execute()
+    try:
+        bulk.execute()
+    except BulkWriteError as bwe:
+        pprint(bwe.details)
+        raise bwe
     return final_case
 
 try:
@@ -139,8 +145,9 @@ try:
     courts = get_list_of_courts(opener)
     last_court_index = 0
     while last_court_index < len(courts):
+        court_name = courts[last_court_index]['fullName']
         if threading.activeCount() < 4:
-            caseNumberThread(courts[last_court_index]['fullName']).start()
+            caseNumberThread(court_name).start()
             last_court_index += 1
         time.sleep(3)
 
