@@ -55,6 +55,7 @@ def get_list_of_courts(opener):
 
 def get_case_numbers(opener, db, court, name):
     courtId = court[:3]
+    courtName = court[5:].replace(' Circuit Court', '')
     data = urllib.urlencode({
         'courtId': courtId,
         'courtType': 'C',
@@ -73,7 +74,7 @@ def get_case_numbers(opener, db, court, name):
     search_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/Search.do"
     search_results = opener.open(search_url, data)
     html = search_results.read()
-    final_case = get_cases(BeautifulSoup(html), court, db)
+    final_case = get_cases(BeautifulSoup(html), courtName, db)
 
     data = urllib.urlencode({
         'courtId': courtId,
@@ -91,15 +92,17 @@ def get_case_numbers(opener, db, court, name):
     final_case_prev = None
     while(final_case != final_case_prev and running):
         curHour = datetime.today().hour
-        if curHour > 8 or curHour < 18:
+        if curHour > 7 and curHour < 18:
             print 'Rate limit during working hours', datetime.today().time()
             time.sleep(15)
-        print 'Request data', court, datetime.today().time()
+        else:
+            time.sleep(1)
+        print 'Request data', courtName, datetime.today().time()
         search_results = opener.open(search_url, data)
         html = search_results.read()
         final_case_prev = final_case
-        print 'Save data', court, datetime.today().time()
-        final_case = get_cases(BeautifulSoup(html), court, db)
+        print 'Save data', courtName, datetime.today().time()
+        final_case = get_cases(BeautifulSoup(html), courtName, db)
 
 def get_cases(html, court, db):
     final_case = None
