@@ -366,7 +366,7 @@ def open_data_progress():
             ('_id.court', 1)
         ])}
     ])['result']
-    chart = pygal.HorizontalBar(style=pygal.style.RedBlueStyle, show_legend=False)
+    chart = pygal.HorizontalBar(style=pygal.style.RedBlueStyle, show_legend=False, height=1500)
     chart.x_labels = [x['_id']['court'] for x in data][::-1]
     chart.add('', [x['count'] for x in data][::-1])
     return chart.render() + str(render_template('open_data_progress.html', data=data))
