@@ -99,12 +99,13 @@ def get_case_numbers(opener, db, court, courtName, name):
             time.sleep(15)
         else:
             time.sleep(1)
-        print 'Request data', courtName, datetime.today().time()
+        print 'Request', courtName, datetime.today().time()
         search_results = opener.open(search_url, data)
         html = search_results.read()
         final_case_prev = final_case
-        print 'Save data', courtName, datetime.today().time()
+        print 'Saving', courtName, datetime.today().time()
         final_case = get_cases(BeautifulSoup(html), courtName, db)
+        print 'Saved', courtName, datetime.today().time()
 
 def get_cases(html, court, db):
     final_case = None
