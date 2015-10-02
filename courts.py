@@ -126,28 +126,28 @@ def lookupCasesInVirginiaBeach(name, division):
 def searchCourt(name, court):
     if 'cookies' not in session:
         return "Error. Please reload the page."
-    
+
     courtId = court[:3]
     courtSearch = {'name': court[5:], 'id': courtId}
-    
-    db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
+
+    db = pymongo.MongoClient(os.environ['MONGO_URI'])['va-circuit-court-search']
     cases = db['cases'].find_one({'name': name, 'court': court})
     if cases is not None:
         print 'Found cached search'
         courtSearch['criminalCases'] = cases['criminalCases']
         courtSearch['civilCases'] = cases['civilCases']
     elif 'Virginia Beach' in court:
-        courtSearch['criminalCases'] = lookupCasesInVirginiaBeach(name, 
+        courtSearch['criminalCases'] = lookupCasesInVirginiaBeach(name,
                                                                   'CRIMINAL')
         courtSearch['civilCases'] = lookupCasesInVirginiaBeach(name, 'CIVIL')
     else:
         cookieJar = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
         opener.addheaders = [('User-Agent', user_agent)]
-        
+
         for cookie in pickle.loads(session['cookies']):
             cookieJar.set_cookie(cookie)
-        
+
         data = urllib.urlencode({
             'courtId': courtId,
             'courtType': 'C',
@@ -157,12 +157,12 @@ def searchCourt(name, court):
             'whichsystem': court})
         place_url = u"http://ewsocis1.courts.state.va.us/CJISWeb/MainMenu.do"
         opener.open(place_url, data)
-        
+
         courtSearch['criminalCases'] = lookupCases(opener, name.upper(),
                                                    courtId, 'R')
         courtSearch['civilCases'] = lookupCases(opener, name.upper(),
                                                 courtId, 'CIVIL')
-    
+
     if cases is None:
         print 'Caching search'
         db['cases'].insert({
@@ -177,11 +177,11 @@ def searchCourt(name, court):
 
 @app.route("/search/<name>")
 def search(name):
-    db = pymongo.Connection(os.environ['MONGO_URI'])['va-circuit-court-search']
+    db = pymongo.MongoClient(os.environ['MONGO_URI'])['va-circuit-court-search']
     db['cases'].remove({
         'dateSaved': {'$lt': datetime.utcnow() + timedelta(days=-3)}
     })
-    
+
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
     opener.addheaders = [('User-Agent', user_agent)]
@@ -246,14 +246,14 @@ def charges():
             'court': {'$first': '$court'},
             'caseNumber': {'$first': '$caseNumber'}
         }},
-        {'$match' : { 
+        {'$match' : {
             'count' : {'$gt' : 50}
         }},
         {'$sort': SON([
             ('_id.CodeSection', 1)
         ])}
     ])['result']
-    
+
     charges_amended = db.criminal_cases.aggregate([
         {'$match': {'AmendedCharge': {'$ne': None}}},
         {'$group':{
@@ -289,7 +289,7 @@ def charges():
             ('_id.CodeSection', 1)
         ])}
     ])['result']
-    
+
     for charge in charges:
         charge['amended'] = {
             'count': 0,
@@ -303,25 +303,25 @@ def charges():
                 break
         charge['races_dict'] = {
             'White Caucasian (Non-Hispanic)': {
-                'count': 0, 
-                'avgSentence': 0, 
+                'count': 0,
+                'avgSentence': 0,
                 'avgSentenceSuspended': 0
             },
             'Black (Non-Hispanic)': {
-                'count': 0, 
-                'avgSentence': 0, 
+                'count': 0,
+                'avgSentence': 0,
                 'avgSentenceSuspended': 0
             }
         }
         charge['amended']['races_dict'] = {
             'White Caucasian (Non-Hispanic)': {
-                'count': 0, 
-                'avgSentence': 0, 
+                'count': 0,
+                'avgSentence': 0,
                 'avgSentenceSuspended': 0
             },
             'Black (Non-Hispanic)': {
-                'count': 0, 
-                'avgSentence': 0, 
+                'count': 0,
+                'avgSentence': 0,
                 'avgSentenceSuspended': 0
             }
         }
@@ -331,9 +331,9 @@ def charges():
         for race in charge['amended']['races']:
             if 'race' in race:
                 charge['amended']['races_dict'][race['race']] = race
-    
+
     return render_template('charges.html', charges=charges, charges_amended=charges_amended)
-    
+
 @app.route("/opendata")
 def open_data():
     client = pymongo.MongoClient(os.environ['MONGO_CASES_URI'])
@@ -383,7 +383,7 @@ def stats():
 def graph():
     categories = request.get_json(force=True)['categories']
     print categories
-    
+
     category = categories[0]['category']
     sub_category = categories[1]['category']
     sort_by = categories[0]['sort']
@@ -392,7 +392,7 @@ def graph():
     sort_direction = int(categories[0]['sortDirection'])
     sort = (sort_by, sort_direction)
     filters = categories[0]['filter']
-    
+
     first_group_stage = {'$group':{
         '_id': {
             category: '$' + category
@@ -415,7 +415,7 @@ def graph():
     sort_stage = {'$sort': SON([
         sort
     ])}
-    
+
     client = pymongo.MongoClient(os.environ['MONGO_URI'])
     db = client.va_circuit_court
     data = None
@@ -430,7 +430,7 @@ def graph():
             second_group_stage,
             sort_stage
         ])['result']
-    
+
     sub_category_names = []
     if sub_category != '':
         for group in data:
@@ -442,11 +442,11 @@ def graph():
                     sub_category_names.append(sub_category_name)
                 group[sub_category_name] = sub_category_group['count']
     print pprint(data)
-    
+
     pprint(sub_category_names)
     values = [str(x['_id'][category]) for x in data]
     labels = [v for v in values if v not in filters][:20]
-    
+
     bar_chart = pygal.Bar(height=450, style=LightStyle, x_label_rotation=70)
     bar_chart.title = 'VA Circuit Court Cases in 2014'
     bar_chart.x_labels = labels
@@ -462,9 +462,9 @@ def graph():
                 else:
                     item_counts.append(0)
             bar_chart.add(item, item_counts[:20])
-    
-    return str(render_template('stats_filters.html', 
-        category=category, 
+
+    return str(render_template('stats_filters.html',
+        category=category,
         filter_values=sorted(values),
         filters_unchecked=filters)) + \
         bar_chart.render()

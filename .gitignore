@@ -61,3 +61,6 @@ target/
 files/
 
 courts_recently_completed.txt
+
+venv
+unexpected_output.html
